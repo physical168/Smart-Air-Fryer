@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Smart air fryer icon</title>
+  <desc id="desc">A compact air fryer with a glowing control display.</desc>
+  <rect width="512" height="512" rx="96" fill="#2f6f64"/>
+  <rect x="132" y="96" width="248" height="320" rx="52" fill="#f7f3ea"/>
+  <rect x="164" y="132" width="184" height="92" rx="24" fill="#1b1f23"/>
+  <rect x="188" y="154" width="136" height="48" rx="14" fill="#d9f3e8"/>
+  <circle cx="210" cy="274" r="24" fill="#c85732"/>
+  <circle cx="256" cy="274" r="24" fill="#2f6f64"/>
+  <circle cx="302" cy="274" r="24" fill="#1b1f23"/>
+  <rect x="178" y="328" width="156" height="28" rx="14" fill="#d7ded8"/>
+</svg>

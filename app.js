@@ -143,3 +143,9 @@ cookingForm.addEventListener("submit", (event) => {
 portionInput.addEventListener("input", validatePortion);
 restorePreference();
 loadRecipes();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js");
+  });
+}
