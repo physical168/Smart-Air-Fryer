@@ -104,10 +104,18 @@ function restorePreference() {
 
 function recipeCardTemplate(recipe) {
   return `
-    <article class="recipe-card">
-      <h3>${recipe.name}</h3>
-      <p>${recipe.description}</p>
-      <p class="recipe-meta">${recipe.temperature} degrees C · ${recipe.minutes} minutes · ${recipe.servings} serving(s)</p>
+    <article class="recipe-card" itemscope itemtype="https://schema.org/Recipe">
+      <h3 itemprop="name">${recipe.name}</h3>
+      <p itemprop="description">${recipe.description}</p>
+      <p class="recipe-meta">
+        <span itemprop="recipeIngredient">${recipe.ingredient}</span>
+        <span aria-hidden="true"> · </span>
+        <span>${recipe.temperature} degrees C</span>
+        <span aria-hidden="true"> · </span>
+        <time itemprop="cookTime" datetime="PT${recipe.minutes}M">${recipe.minutes} minutes</time>
+        <span aria-hidden="true"> · </span>
+        <span itemprop="recipeYield">${recipe.servings} serving(s)</span>
+      </p>
     </article>
   `;
 }
@@ -122,10 +130,12 @@ async function loadRecipes() {
 
     const recipes = await response.json();
     recipeList.innerHTML = recipes.map(recipeCardTemplate).join("");
+    recipeList.setAttribute("aria-busy", "false");
   } catch (error) {
     recipeList.innerHTML = `
       <p class="loading-message">Recipe presets are unavailable. Please try again after refreshing the page.</p>
     `;
+    recipeList.setAttribute("aria-busy", "false");
   }
 }
 

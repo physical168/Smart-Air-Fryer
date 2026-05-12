@@ -78,8 +78,9 @@
         <div class="section-heading">
           <p class="eyebrow">Cooking assistant</p>
           <h2 id="assistant-title">Build a cooking plan</h2>
+          <p id="assistant-description">Required inputs are ingredient, portion size, texture, and oil preference.</p>
         </div>
-        <form id="cooking-form" class="cooking-form" novalidate>
+        <form id="cooking-form" class="cooking-form" aria-describedby="assistant-description" novalidate>
           <div class="form-grid">
             <div class="field-group">
               <label for="ingredient">Main ingredient</label>
@@ -130,7 +131,7 @@
           </div>
           <button type="submit">Create cooking plan</button>
         </form>
-        <article id="plan-output" class="plan-output" aria-live="polite">
+        <article id="plan-output" class="plan-output" aria-live="polite" aria-atomic="true">
           <h3>Suggested plan</h3>
           <p>Submit the form to generate your first smart air fryer recommendation.</p>
         </article>
@@ -141,7 +142,7 @@
           <p class="eyebrow">Recipe presets</p>
           <h2 id="recipes-title">Quick presets</h2>
         </div>
-        <div id="recipe-list" class="recipe-list" aria-live="polite">
+        <div id="recipe-list" class="recipe-list" aria-live="polite" aria-busy="true">
           <p class="loading-message">Loading recipe presets...</p>
         </div>
       </section>
