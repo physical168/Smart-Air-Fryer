@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="AtelierKitchen Smart Air Fryer helps students plan safer, healthier air fryer meals with accessible cooking guidance.">
+    <title>AtelierKitchen Smart Air Fryer</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header class="site-header">
+      <div class="brand-block">
+        <p class="eyebrow">AtelierKitchen</p>
+        <h1>Smart Air Fryer Assistant</h1>
+        <p class="tagline">Plan crisp, safer meals with guided presets and saved cooking preferences.</p>
+      </div>
+      <nav class="primary-nav" aria-label="Primary navigation">
+        <ul>
+          <li><a href="#dashboard" aria-current="page">Dashboard</a></li>
+          <li><a href="#assistant">Assistant</a></li>
+          <li><a href="#recipes">Recipes</a></li>
+          <li><a href="#safety">Safety</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main-content">
+      <section id="dashboard" class="dashboard-section" aria-labelledby="dashboard-title">
+        <div>
+          <p class="eyebrow">Current setup</p>
+          <h2 id="dashboard-title">Ready for your next cook</h2>
+          <p>
+            Choose an ingredient, portion size, and preferred texture. The assistant will suggest
+            a starting temperature, cooking time, and care reminders.
+          </p>
+        </div>
+        <aside class="status-panel" aria-label="Air fryer status">
+          <dl>
+            <div>
+              <dt>Basket</dt>
+              <dd>Clean</dd>
+            </div>
+            <div>
+              <dt>Mode</dt>
+              <dd>Standby</dd>
+            </div>
+            <div>
+              <dt>Last saved</dt>
+              <dd id="last-saved">No saved preference</dd>
+            </div>
+          </dl>
+        </aside>
+      </section>
+
+      <section id="assistant" class="assistant-section" aria-labelledby="assistant-title">
+        <div class="section-heading">
+          <p class="eyebrow">Cooking assistant</p>
+          <h2 id="assistant-title">Build a cooking plan</h2>
+        </div>
+        <form id="cooking-form" class="cooking-form">
+          <div class="form-grid">
+            <div class="field-group">
+              <label for="ingredient">Main ingredient</label>
+              <select id="ingredient" name="ingredient">
+                <option value="potatoes">Potatoes</option>
+                <option value="chicken">Chicken breast</option>
+                <option value="tofu">Tofu</option>
+                <option value="vegetables">Mixed vegetables</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="portion">Portion size</label>
+              <input id="portion" name="portion" type="number" min="1" max="6" value="2">
+            </div>
+            <div class="field-group">
+              <label for="texture">Preferred texture</label>
+              <select id="texture" name="texture">
+                <option value="balanced">Balanced</option>
+                <option value="crispy">Extra crispy</option>
+                <option value="gentle">Gentle</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit">Create cooking plan</button>
+        </form>
+        <article id="plan-output" class="plan-output" aria-live="polite">
+          <h3>Suggested plan</h3>
+          <p>Submit the form to generate your first smart air fryer recommendation.</p>
+        </article>
+      </section>
+
+      <section id="recipes" class="recipes-section" aria-labelledby="recipes-title">
+        <div class="section-heading">
+          <p class="eyebrow">Recipe presets</p>
+          <h2 id="recipes-title">Quick presets</h2>
+        </div>
+        <div id="recipe-list" class="recipe-list">
+          <article class="recipe-card">
+            <h3>Golden potato wedges</h3>
+            <p>190 degrees C for 18 minutes. Shake halfway through cooking.</p>
+          </article>
+          <article class="recipe-card">
+            <h3>Lemon herb chicken</h3>
+            <p>180 degrees C for 16 minutes. Check the thickest part before serving.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="safety" class="safety-section" aria-labelledby="safety-title">
+        <div class="section-heading">
+          <p class="eyebrow">Care guidance</p>
+          <h2 id="safety-title">Safety reminders</h2>
+        </div>
+        <ul class="safety-list">
+          <li>Preheat only when the selected preset recommends it.</li>
+          <li>Keep the basket below the max fill line for even airflow.</li>
+          <li>Use a food thermometer for poultry and thick cuts.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Smart Air Fryer Assistant for the AtelierKitchen coursework project.</p>
+      <a href="https://github.com/physical168/Smart-Air-Fryer">GitHub repository</a>
+    </footer>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
