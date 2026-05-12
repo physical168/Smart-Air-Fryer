@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Golden potato wedges",
+    "description": "Crisp potato wedges with a tender center and a simple herb coating.",
+    "temperature": 190,
+    "minutes": 18,
+    "servings": 2,
+    "ingredient": "Potatoes"
+  },
+  {
+    "name": "Lemon herb chicken",
+    "description": "Lean chicken breast with lemon, pepper, and a safety-first doneness check.",
+    "temperature": 180,
+    "minutes": 16,
+    "servings": 2,
+    "ingredient": "Chicken breast"
+  },
+  {
+    "name": "Sesame tofu bites",
+    "description": "Firm tofu cubes with a crisp edge and low-oil cooking guidance.",
+    "temperature": 185,
+    "minutes": 14,
+    "servings": 2,
+    "ingredient": "Tofu"
+  },
+  {
+    "name": "Colorful vegetable tray",
+    "description": "Mixed vegetables cut to even sizes for balanced airflow and color.",
+    "temperature": 175,
+    "minutes": 12,
+    "servings": 3,
+    "ingredient": "Mixed vegetables"
+  }
+]

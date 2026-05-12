@@ -374,6 +374,16 @@ button:hover {
   padding: 1rem;
 }
 
+.recipe-meta {
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.loading-message {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
 .safety-list {
   display: grid;
   gap: 0.5rem;

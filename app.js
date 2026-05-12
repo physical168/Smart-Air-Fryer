@@ -3,6 +3,7 @@ const planOutput = document.querySelector("#plan-output");
 const portionInput = document.querySelector("#portion");
 const portionError = document.querySelector("#portion-error");
 const lastSaved = document.querySelector("#last-saved");
+const recipeList = document.querySelector("#recipe-list");
 const storageKey = "atelierKitchenCookingPreference";
 
 const presets = {
@@ -101,6 +102,33 @@ function restorePreference() {
   }
 }
 
+function recipeCardTemplate(recipe) {
+  return `
+    <article class="recipe-card">
+      <h3>${recipe.name}</h3>
+      <p>${recipe.description}</p>
+      <p class="recipe-meta">${recipe.temperature} degrees C · ${recipe.minutes} minutes · ${recipe.servings} serving(s)</p>
+    </article>
+  `;
+}
+
+async function loadRecipes() {
+  try {
+    const response = await fetch("data/recipes.json");
+
+    if (!response.ok) {
+      throw new Error("Recipe data failed to load.");
+    }
+
+    const recipes = await response.json();
+    recipeList.innerHTML = recipes.map(recipeCardTemplate).join("");
+  } catch (error) {
+    recipeList.innerHTML = `
+      <p class="loading-message">Recipe presets are unavailable. Please try again after refreshing the page.</p>
+    `;
+  }
+}
+
 cookingForm.addEventListener("submit", (event) => {
   event.preventDefault();
   if (!validatePortion()) {
@@ -114,3 +142,4 @@ cookingForm.addEventListener("submit", (event) => {
 
 portionInput.addEventListener("input", validatePortion);
 restorePreference();
+loadRecipes();
