@@ -2,6 +2,8 @@ const cookingForm = document.querySelector("#cooking-form");
 const planOutput = document.querySelector("#plan-output");
 const portionInput = document.querySelector("#portion");
 const portionError = document.querySelector("#portion-error");
+const lastSaved = document.querySelector("#last-saved");
+const storageKey = "atelierKitchenCookingPreference";
 
 const presets = {
   potatoes: { temperature: 190, minutes: 18, reminder: "Shake the basket halfway through." },
@@ -58,6 +60,47 @@ function renderPlan(plan) {
   `;
 }
 
+function savePlan(plan) {
+  const savedPlan = {
+    ...plan,
+    savedAt: new Date().toISOString()
+  };
+
+  localStorage.setItem(storageKey, JSON.stringify(savedPlan));
+  updateSavedStatus(savedPlan);
+}
+
+function updateSavedStatus(plan) {
+  const date = new Date(plan.savedAt);
+  lastSaved.textContent = `${plan.ingredient}, ${plan.portion} portion(s), ${date.toLocaleDateString()}`;
+}
+
+function restorePreference() {
+  const saved = localStorage.getItem(storageKey);
+
+  if (!saved) {
+    return;
+  }
+
+  try {
+    const plan = JSON.parse(saved);
+    cookingForm.elements.ingredient.value = plan.ingredient;
+    cookingForm.elements.portion.value = plan.portion;
+    cookingForm.elements.texture.value = plan.texture;
+    cookingForm.elements.oil.value = plan.oil;
+    cookingForm.elements.notes.value = plan.notes || "";
+
+    cookingForm.querySelectorAll('input[name="dietary"]').forEach((checkbox) => {
+      checkbox.checked = plan.dietary.includes(checkbox.value);
+    });
+
+    renderPlan(plan);
+    updateSavedStatus(plan);
+  } catch (error) {
+    localStorage.removeItem(storageKey);
+  }
+}
+
 cookingForm.addEventListener("submit", (event) => {
   event.preventDefault();
   if (!validatePortion()) {
@@ -66,6 +109,8 @@ cookingForm.addEventListener("submit", (event) => {
   }
   const plan = buildPlan(new FormData(cookingForm));
   renderPlan(plan);
+  savePlan(plan);
 });
 
 portionInput.addEventListener("input", validatePortion);
+restorePreference();
