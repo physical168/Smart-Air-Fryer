@@ -76,7 +76,7 @@
           <p class="eyebrow">Cooking assistant</p>
           <h2 id="assistant-title">Build a cooking plan</h2>
         </div>
-        <form id="cooking-form" class="cooking-form">
+        <form id="cooking-form" class="cooking-form" novalidate>
           <div class="form-grid">
             <div class="field-group">
               <label for="ingredient">Main ingredient</label>
@@ -89,7 +89,9 @@
             </div>
             <div class="field-group">
               <label for="portion">Portion size</label>
-              <input id="portion" name="portion" type="number" min="1" max="6" value="2">
+              <input id="portion" name="portion" type="number" min="1" max="6" value="2" aria-describedby="portion-help portion-error" required>
+              <span id="portion-help" class="field-help">Choose between 1 and 6 portions.</span>
+              <span id="portion-error" class="field-error" aria-live="polite"></span>
             </div>
             <div class="field-group">
               <label for="texture">Preferred texture</label>
@@ -98,6 +100,29 @@
                 <option value="crispy">Extra crispy</option>
                 <option value="gentle">Gentle</option>
               </select>
+            </div>
+            <div class="field-group">
+              <label for="oil">Oil preference</label>
+              <select id="oil" name="oil">
+                <option value="standard">Standard light coating</option>
+                <option value="low">Low oil</option>
+                <option value="none">No added oil</option>
+              </select>
+            </div>
+            <fieldset class="field-group checkbox-field">
+              <legend>Dietary notes</legend>
+              <label>
+                <input type="checkbox" name="dietary" value="gluten-free">
+                Gluten-free
+              </label>
+              <label>
+                <input type="checkbox" name="dietary" value="plant-based">
+                Plant-based
+              </label>
+            </fieldset>
+            <div class="field-group form-notes">
+              <label for="notes">Cooking notes</label>
+              <textarea id="notes" name="notes" rows="3" maxlength="120" placeholder="Example: cut smaller pieces, avoid spicy seasoning"></textarea>
             </div>
           </div>
           <button type="submit">Create cooking plan</button>

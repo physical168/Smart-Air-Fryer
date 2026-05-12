@@ -1,5 +1,7 @@
 const cookingForm = document.querySelector("#cooking-form");
 const planOutput = document.querySelector("#plan-output");
+const portionInput = document.querySelector("#portion");
+const portionError = document.querySelector("#portion-error");
 
 const presets = {
   potatoes: { temperature: 190, minutes: 18, reminder: "Shake the basket halfway through." },
@@ -12,6 +14,9 @@ function buildPlan(formData) {
   const ingredient = formData.get("ingredient");
   const portion = Number(formData.get("portion"));
   const texture = formData.get("texture");
+  const oil = formData.get("oil");
+  const notes = formData.get("notes").trim();
+  const dietary = formData.getAll("dietary");
   const preset = presets[ingredient];
   const textureOffset = texture === "crispy" ? 3 : texture === "gentle" ? -2 : 0;
   const portionOffset = Math.max(0, portion - 2) * 2;
@@ -20,22 +25,47 @@ function buildPlan(formData) {
     ingredient,
     portion,
     texture,
+    oil,
+    notes,
+    dietary,
     temperature: preset.temperature,
     minutes: preset.minutes + textureOffset + portionOffset,
     reminder: preset.reminder
   };
 }
 
+function validatePortion() {
+  const portion = Number(portionInput.value);
+  const isValid = Number.isInteger(portion) && portion >= 1 && portion <= 6;
+  portionInput.setAttribute("aria-invalid", String(!isValid));
+  portionError.textContent = isValid ? "" : "Enter a whole number from 1 to 6.";
+  return isValid;
+}
+
 function renderPlan(plan) {
+  const oilText = {
+    standard: "Use a light oil coating.",
+    low: "Use a small spray of oil.",
+    none: "Skip added oil and check texture halfway."
+  }[plan.oil];
+  const dietaryText = plan.dietary.length > 0 ? ` Dietary notes: ${plan.dietary.join(", ")}.` : "";
+  const notesText = plan.notes ? ` Notes: ${plan.notes}.` : "";
+
   planOutput.innerHTML = `
     <h3>Suggested plan</h3>
     <p><strong>${plan.portion} portion(s) of ${plan.ingredient}</strong></p>
-    <p>Cook at ${plan.temperature} degrees C for ${plan.minutes} minutes. ${plan.reminder}</p>
+    <p>Cook at ${plan.temperature} degrees C for ${plan.minutes} minutes. ${plan.reminder} ${oilText}${dietaryText}${notesText}</p>
   `;
 }
 
 cookingForm.addEventListener("submit", (event) => {
   event.preventDefault();
+  if (!validatePortion()) {
+    portionInput.focus();
+    return;
+  }
   const plan = buildPlan(new FormData(cookingForm));
   renderPlan(plan);
 });
+
+portionInput.addEventListener("input", validatePortion);
