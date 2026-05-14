@@ -72,6 +72,12 @@
             </div>
           </dl>
         </aside>
+        <aside class="favorites-panel" aria-labelledby="favorites-title">
+          <h3 id="favorites-title">My Favorites</h3>
+          <div id="favorites-list" class="favorites-grid">
+            <p class="empty-message">No favorites saved yet.</p>
+          </div>
+        </aside>
       </section>
 
       <section id="assistant" class="assistant-section" aria-labelledby="assistant-title">
@@ -141,6 +147,10 @@
         <div class="section-heading">
           <p class="eyebrow">Recipe presets</p>
           <h2 id="recipes-title">Quick presets</h2>
+          <div class="search-box">
+            <label for="recipe-search" class="visually-hidden">Search recipes</label>
+            <input type="search" id="recipe-search" placeholder="Search by ingredient or name..." aria-controls="recipe-list">
+          </div>
         </div>
         <div id="recipe-list" class="recipe-list" aria-live="polite" aria-busy="true">
           <p class="loading-message">Loading recipe presets...</p>
@@ -157,6 +167,15 @@
           <li>Keep the basket below the max fill line for even airflow.</li>
           <li>Use a food thermometer for poultry and thick cuts.</li>
         </ul>
+        <div class="timer-widget">
+          <h3>Quick Timer</h3>
+          <div class="timer-display" role="timer" aria-live="off">00:00</div>
+          <div class="timer-controls">
+            <button id="start-timer" type="button">Start 5m Timer</button>
+            <button id="stop-timer" type="button">Stop</button>
+          </div>
+          <audio id="timer-beep" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+        </div>
       </section>
     </main>
 
