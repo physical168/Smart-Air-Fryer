@@ -6,6 +6,7 @@ const lastSaved = document.querySelector("#last-saved");
 const recipeList = document.querySelector("#recipe-list");
 const storageKey = "atelierKitchenCookingPreference";
 const favoritesKey = "atelierKitchenFavorites";
+const favoritesList = document.querySelector("#favorites-list");
 let allRecipes = [];
 
 const presets = {
@@ -134,6 +135,27 @@ function renderRecipes(recipes) {
     .join("");
 }
 
+function renderFavorites() {
+  const favorites = getFavorites();
+  const favRecipes = allRecipes.filter((r) => favorites.includes(r.id));
+
+  if (favRecipes.length === 0) {
+    favoritesList.innerHTML = '<p class="empty-message">No favorites saved yet.</p>';
+    return;
+  }
+
+  favoritesList.innerHTML = favRecipes
+    .map(
+      (recipe) => `
+    <div class="fav-card">
+      <strong>${recipe.name}</strong>
+      <p>${recipe.temperature}°C | ${recipe.minutes}m</p>
+    </div>
+  `
+    )
+    .join("");
+}
+
 function getFavorites() {
   return JSON.parse(localStorage.getItem(favoritesKey)) || [];
 }
@@ -149,6 +171,7 @@ async function loadRecipes() {
     const recipes = await response.json();
     allRecipes = recipes; // Store for search
     renderRecipes(recipes);
+    renderFavorites();
     recipeList.setAttribute("aria-busy", "false");
   } catch (error) {
     recipeList.innerHTML = `
@@ -174,6 +197,7 @@ function handleFavoriteClick(event) {
   
   localStorage.setItem(favoritesKey, JSON.stringify(favorites));
   renderRecipes(allRecipes); // Re-render to update UI across all cards
+  renderFavorites();
 }
 
 cookingForm.addEventListener("submit", (event) => {
