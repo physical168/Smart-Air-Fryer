@@ -8,7 +8,10 @@ const storageKey = "atelierKitchenCookingPreference";
 const favoritesKey = "atelierKitchenFavorites";
 const favoritesList = document.querySelector("#favorites-list");
 const recipeSearch = document.querySelector("#recipe-search");
+const timerDisplay = document.querySelector(".timer-display");
+const beep = document.querySelector("#timer-beep");
 let allRecipes = [];
+let timerInterval;
 
 const presets = {
   potatoes: { temperature: 190, minutes: 18, reminder: "Shake the basket halfway through." },
@@ -201,6 +204,28 @@ function handleFavoriteClick(event) {
   renderFavorites();
 }
 
+function startTimer(seconds) {
+  clearInterval(timerInterval);
+  let timeLeft = seconds;
+  
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    if (timeLeft < 0) {
+      clearInterval(timerInterval);
+      beep.play();
+      alert("Cooking complete! Enjoy your meal.");
+      timerDisplay.textContent = "00:00";
+      return;
+    }
+    
+    const mins = Math.floor(timeLeft / 60);
+    const secs = timeLeft % 60;
+    timerDisplay.textContent = `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  }, 1000);
+}
+
 cookingForm.addEventListener("submit", (event) => {
   event.preventDefault();
   if (!validatePortion()) {
@@ -226,6 +251,12 @@ recipeSearch.addEventListener("input", (e) => {
 });
 
 recipeList.addEventListener("click", handleFavoriteClick);
+
+document.querySelector("#start-timer").addEventListener("click", () => startTimer(300));
+document.querySelector("#stop-timer").addEventListener("click", () => {
+  clearInterval(timerInterval);
+  timerDisplay.textContent = "00:00";
+});
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
