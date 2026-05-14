@@ -5,6 +5,8 @@ const portionError = document.querySelector("#portion-error");
 const lastSaved = document.querySelector("#last-saved");
 const recipeList = document.querySelector("#recipe-list");
 const storageKey = "atelierKitchenCookingPreference";
+const favoritesKey = "atelierKitchenFavorites";
+let allRecipes = [];
 
 const presets = {
   potatoes: { temperature: 190, minutes: 18, reminder: "Shake the basket halfway through." },
@@ -102,10 +104,15 @@ function restorePreference() {
   }
 }
 
-function recipeCardTemplate(recipe) {
+function recipeCardTemplate(recipe, isFav = false) {
   return `
     <article class="recipe-card" itemscope itemtype="https://schema.org/Recipe">
-      <h3 itemprop="name">${recipe.name}</h3>
+      <div class="card-header">
+        <h3 itemprop="name">${recipe.name}</h3>
+        <button class="btn-fav ${isFav ? 'active' : ''}" data-id="${recipe.id}" aria-label="Toggle favorite">
+          ❤
+        </button>
+      </div>
       <p itemprop="description">${recipe.description}</p>
       <p class="recipe-meta">
         <span itemprop="recipeIngredient">${recipe.ingredient}</span>
@@ -120,6 +127,17 @@ function recipeCardTemplate(recipe) {
   `;
 }
 
+function renderRecipes(recipes) {
+  const favorites = getFavorites();
+  recipeList.innerHTML = recipes
+    .map((recipe) => recipeCardTemplate(recipe, favorites.includes(recipe.id)))
+    .join("");
+}
+
+function getFavorites() {
+  return JSON.parse(localStorage.getItem(favoritesKey)) || [];
+}
+
 async function loadRecipes() {
   try {
     const response = await fetch("data/recipes.json");
@@ -129,7 +147,8 @@ async function loadRecipes() {
     }
 
     const recipes = await response.json();
-    recipeList.innerHTML = recipes.map(recipeCardTemplate).join("");
+    allRecipes = recipes; // Store for search
+    renderRecipes(recipes);
     recipeList.setAttribute("aria-busy", "false");
   } catch (error) {
     recipeList.innerHTML = `
@@ -137,6 +156,15 @@ async function loadRecipes() {
     `;
     recipeList.setAttribute("aria-busy", "false");
   }
+}
+
+function handleFavoriteClick(event) {
+  const btn = event.target.closest(".btn-fav");
+  if (!btn) return;
+  
+  const recipeId = btn.dataset.id;
+  btn.classList.toggle("active");
+  console.log(`Toggled favorite for recipe ID: ${recipeId}`);
 }
 
 cookingForm.addEventListener("submit", (event) => {
@@ -153,6 +181,7 @@ cookingForm.addEventListener("submit", (event) => {
 portionInput.addEventListener("input", validatePortion);
 restorePreference();
 loadRecipes();
+recipeList.addEventListener("click", handleFavoriteClick);
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
