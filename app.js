@@ -163,8 +163,17 @@ function handleFavoriteClick(event) {
   if (!btn) return;
   
   const recipeId = btn.dataset.id;
-  btn.classList.toggle("active");
-  console.log(`Toggled favorite for recipe ID: ${recipeId}`);
+  let favorites = getFavorites();
+  const index = favorites.indexOf(recipeId);
+  
+  if (index > -1) {
+    favorites.splice(index, 1);
+  } else {
+    favorites.push(recipeId);
+  }
+  
+  localStorage.setItem(favoritesKey, JSON.stringify(favorites));
+  renderRecipes(allRecipes); // Re-render to update UI across all cards
 }
 
 cookingForm.addEventListener("submit", (event) => {
