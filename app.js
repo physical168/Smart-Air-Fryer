@@ -7,6 +7,7 @@ const recipeList = document.querySelector("#recipe-list");
 const storageKey = "atelierKitchenCookingPreference";
 const favoritesKey = "atelierKitchenFavorites";
 const favoritesList = document.querySelector("#favorites-list");
+const recipeSearch = document.querySelector("#recipe-search");
 let allRecipes = [];
 
 const presets = {
@@ -214,6 +215,16 @@ cookingForm.addEventListener("submit", (event) => {
 portionInput.addEventListener("input", validatePortion);
 restorePreference();
 loadRecipes();
+
+recipeSearch.addEventListener("input", (e) => {
+  const term = e.target.value.toLowerCase();
+  const filtered = allRecipes.filter(
+    (r) =>
+      r.name.toLowerCase().includes(term) || r.ingredient.toLowerCase().includes(term)
+  );
+  renderRecipes(filtered);
+});
+
 recipeList.addEventListener("click", handleFavoriteClick);
 
 if ("serviceWorker" in navigator) {
