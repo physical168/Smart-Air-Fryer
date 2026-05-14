@@ -215,6 +215,26 @@ h3 {
   color: #e74c3c;
 }
 
+.search-history {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.search-chip {
+  background: #eee;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: none;
+}
+
+.search-chip:hover {
+  background: #ddd;
+}
+
 .primary-nav a[aria-current="page"] {
   border-color: var(--accent);
   background: #e6f0ed;

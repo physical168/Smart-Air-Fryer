@@ -10,6 +10,8 @@ const favoritesList = document.querySelector("#favorites-list");
 const recipeSearch = document.querySelector("#recipe-search");
 const timerDisplay = document.querySelector(".timer-display");
 const beep = document.querySelector("#timer-beep");
+const searchHistory = document.querySelector("#search-history");
+const searchHistoryKey = "atelierKitchenSearchHistory";
 let allRecipes = [];
 let timerInterval;
 
@@ -243,13 +245,50 @@ loadRecipes();
 
 recipeSearch.addEventListener("input", (e) => {
   const term = e.target.value.toLowerCase();
+  performSearch(term);
+});
+
+recipeSearch.addEventListener("change", (e) => {
+  const term = e.target.value.trim();
+  if (term.length > 2) {
+    saveSearchHistory(term);
+  }
+});
+
+function performSearch(term) {
   const filtered = allRecipes.filter(
     (r) =>
       r.name.toLowerCase().includes(term) || r.ingredient.toLowerCase().includes(term)
   );
   renderRecipes(filtered);
+}
+
+function saveSearchHistory(term) {
+  let history = JSON.parse(localStorage.getItem(searchHistoryKey)) || [];
+  if (!history.includes(term)) {
+    history.unshift(term);
+    history = history.slice(0, 5); // Keep last 5
+    localStorage.setItem(searchHistoryKey, JSON.stringify(history));
+    renderSearchHistory();
+  }
+}
+
+function renderSearchHistory() {
+  const history = JSON.parse(localStorage.getItem(searchHistoryKey)) || [];
+  searchHistory.innerHTML = history
+    .map((term) => `<button class="search-chip" type="button">${term}</button>`)
+    .join("");
+}
+
+searchHistory.addEventListener("click", (e) => {
+  if (e.target.classList.contains("search-chip")) {
+    const term = e.target.textContent;
+    recipeSearch.value = term;
+    performSearch(term.toLowerCase());
+  }
 });
 
+renderSearchHistory();
 recipeList.addEventListener("click", handleFavoriteClick);
 
 document.querySelector("#start-timer").addEventListener("click", () => startTimer(300));
