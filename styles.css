@@ -140,6 +140,35 @@ select:focus-visible {
   background: var(--accent-coral);
 }
 
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.app-header__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.app-header__icon-btn:hover {
+  color: var(--ink);
+  background: rgba(172, 53, 9, 0.06);
+}
+
+.app-header__icon {
+  display: block;
+}
+
 .app-main {
   flex: 1;
   width: 100%;
@@ -148,13 +177,22 @@ select:focus-visible {
   padding: 6rem 1.5rem calc(var(--nav-h) + 2rem);
 }
 
-/* Multi-view routing (commit 2 will wire navigation) */
+/* Multi-view routing */
 .app-view {
   display: none;
 }
 
 .app-view.is-active {
   display: block;
+}
+
+.app-view:focus {
+  outline: none;
+}
+
+.view-placeholder h2:focus {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
 }
 
 .view-placeholder {
