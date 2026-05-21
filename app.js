@@ -10,8 +10,54 @@ const SELECTED_FOOD_KEY = "atelierKitchenSelectedFood";
 const viewElements = new Map();
 const navButtons = [];
 
+const FALLBACK_RECIPES = [
+  {
+    id: "galettes",
+    name: "French Galettes",
+    description: "Crispy buckwheat galettes with even browning from frozen.",
+    temperature: 180,
+    minutes: 12,
+    servings: 2,
+    ingredient: "French galettes",
+    keywords: ["galette", "galettes", "french", "buckwheat", "jambon"],
+    badge: "preset",
+    badgeLabel: "Preset available",
+    image: "https://www.figma.com/api/mcp/asset/8b2652d1-8751-4c8c-8501-0f59fe4dfb98",
+    tip: "Flip once halfway for even crisping."
+  },
+  {
+    id: "ham",
+    name: "Frozen Ham",
+    description: "Frozen ham slices reheated without drying out.",
+    temperature: 165,
+    minutes: 18,
+    servings: 2,
+    ingredient: "Frozen ham",
+    keywords: ["ham", "jambon", "frozen", "pork"],
+    badge: "frozen",
+    badgeLabel: "Frozen setting",
+    image: "https://www.figma.com/api/mcp/asset/b25c3aec-2a00-460d-960c-7e3f23f67456",
+    tip: "Use light oil spray to avoid drying."
+  },
+  {
+    id: "seafood",
+    name: "Seafood Mix",
+    description: "Mixed seafood with quick high-heat finish.",
+    temperature: 200,
+    minutes: 8,
+    servings: 2,
+    ingredient: "Seafood mix",
+    keywords: ["seafood", "shrimp", "fish", "mix", "healthy"],
+    badge: "healthy",
+    badgeLabel: "Healthy choice",
+    image: "https://www.figma.com/api/mcp/asset/24c5963a-889f-4af7-8263-e7c38bbcc06e",
+    tip: "Preheat for 2 minutes before cooking."
+  }
+];
+
 let recipes = [];
 let recipesById = new Map();
+let recipesReady = false;
 
 function getViewFromHash() {
   const hash = window.location.hash.replace("#", "").trim();
@@ -222,15 +268,38 @@ function renderFoodCards(list) {
   });
 }
 
+function normalizeSearchText(value) {
+  return value.trim().toLowerCase();
+}
+
 function recipeMatchesQuery(recipe, query) {
-  const lower = query.toLowerCase();
-  if (recipe.name.toLowerCase().includes(lower)) {
+  const lower = normalizeSearchText(query);
+  if (!lower) {
     return true;
   }
-  if (recipe.ingredient.toLowerCase().includes(lower)) {
+
+  const fields = [
+    recipe.id,
+    recipe.name,
+    recipe.ingredient,
+    recipe.description,
+    ...(recipe.keywords || [])
+  ]
+    .filter(Boolean)
+    .map((value) => String(value).toLowerCase());
+
+  if (fields.some((field) => field.includes(lower))) {
     return true;
   }
-  return recipe.keywords.some((word) => word.includes(lower) || lower.includes(word));
+
+  const nameWords = recipe.name.toLowerCase().split(/\s+/);
+  return nameWords.some((word) => word.startsWith(lower) || lower.startsWith(word));
+}
+
+function setRecipesData(list) {
+  recipes = list;
+  recipesById = new Map(recipes.map((recipe) => [recipe.id, recipe]));
+  recipesReady = true;
 }
 
 function filterRecipes(query) {
@@ -259,6 +328,11 @@ function openFoodDetail(foodId) {
 }
 
 function handleSearchSubmit(query) {
+  if (!recipesReady || recipes.length === 0) {
+    setSearchStatus("Presets are still loading. Please try again in a moment.", "error");
+    return;
+  }
+
   const matches = filterRecipes(query);
 
   if (!query.trim()) {
@@ -290,6 +364,10 @@ function initHomeInteractions() {
 
   if (searchInput) {
     searchInput.addEventListener("input", () => {
+      if (!recipesReady) {
+        setSearchStatus("Presets are still loading…", "");
+        return;
+      }
       const matches = filterRecipes(searchInput.value);
       renderFoodCards(matches);
       if (searchInput.value.trim()) {
@@ -346,16 +424,22 @@ async function loadRecipes() {
       throw new Error("Recipe data failed to load.");
     }
 
-    recipes = await response.json();
-    recipesById = new Map(recipes.map((recipe) => [recipe.id, recipe]));
+    const data = await response.json();
+    setRecipesData(data);
     renderFoodCards(recipes);
+    setSearchStatus("");
   } catch (error) {
+    setRecipesData(FALLBACK_RECIPES);
+    renderFoodCards(recipes);
+    setSearchStatus(
+      window.location.protocol === "file:"
+        ? "Using built-in presets. For AJAX loading, run: python -m http.server 8000"
+        : "Loaded built-in presets (network fetch unavailable).",
+      ""
+    );
     if (container) {
-      container.innerHTML =
-        `<li class="food-card-list__empty">Recipe presets are unavailable. Please refresh the page.</li>`;
       container.setAttribute("aria-busy", "false");
     }
-    setSearchStatus("Could not load recipe presets.", "error");
   }
 }
 
@@ -378,14 +462,14 @@ function initHeaderActions() {
   }
 }
 
-function initApp() {
+async function initApp() {
   if (!document.querySelector("#view-home")) {
     return;
   }
 
   initRouting();
   initHeaderActions();
-  loadRecipes();
+  await loadRecipes();
   initHomeInteractions();
   document.documentElement.dataset.appReady = "true";
 }
