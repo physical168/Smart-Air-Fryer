@@ -339,6 +339,23 @@ select:focus-visible {
   padding-top: 0.5rem;
 }
 
+.home-search-status {
+  min-height: 1.25rem;
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.home-search-status--error {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.home-search-status--success {
+  color: var(--accent-teal);
+  font-weight: 600;
+}
+
 .quick-card {
   margin: 0;
   padding: 1.625rem;
@@ -347,6 +364,14 @@ select:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.quick-card:hover {
+  filter: brightness(0.98);
 }
 
 .quick-card--teal {
@@ -443,14 +468,37 @@ select:focus-visible {
   gap: 1.5rem;
 }
 
+.food-card-list__loading,
+.food-card-list__empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--muted);
+  list-style: none;
+}
+
 .food-card {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  width: 100%;
   padding: 1.5rem;
+  border: none;
   background: var(--bg-surface);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.food-card:hover {
+  box-shadow: 0 14px 36px rgba(172, 53, 9, 0.08);
+}
+
+.food-card:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
 }
 
 .food-card__image {
@@ -587,6 +635,39 @@ select:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.detail-panel__meta {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  text-align: left;
+}
+
+.detail-panel__meta div {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  gap: 0.5rem;
+}
+
+.detail-panel__meta dt {
+  margin: 0;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.detail-panel__meta dd {
+  margin: 0;
+  color: var(--ink);
+}
+
+.detail-panel__note {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 @media (max-width: 600px) {

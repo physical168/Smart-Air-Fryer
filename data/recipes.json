@@ -1,34 +1,44 @@
 [
   {
-    "name": "Golden potato wedges",
-    "description": "Crisp potato wedges with a tender center and a simple herb coating.",
-    "temperature": 190,
+    "id": "galettes",
+    "name": "French Galettes",
+    "description": "Crispy buckwheat galettes with even browning from frozen.",
+    "temperature": 180,
+    "minutes": 12,
+    "servings": 2,
+    "ingredient": "French galettes",
+    "keywords": ["galette", "galettes", "french", "buckwheat", "jambon"],
+    "badge": "preset",
+    "badgeLabel": "Preset available",
+    "image": "https://www.figma.com/api/mcp/asset/8b2652d1-8751-4c8c-8501-0f59fe4dfb98",
+    "tip": "Flip once halfway for even crisping."
+  },
+  {
+    "id": "ham",
+    "name": "Frozen Ham",
+    "description": "Frozen ham slices reheated without drying out.",
+    "temperature": 165,
     "minutes": 18,
     "servings": 2,
-    "ingredient": "Potatoes"
+    "ingredient": "Frozen ham",
+    "keywords": ["ham", "jambon", "frozen", "pork"],
+    "badge": "frozen",
+    "badgeLabel": "Frozen setting",
+    "image": "https://www.figma.com/api/mcp/asset/b25c3aec-2a00-460d-960c-7e3f23f67456",
+    "tip": "Use light oil spray to avoid drying."
   },
   {
-    "name": "Lemon herb chicken",
-    "description": "Lean chicken breast with lemon, pepper, and a safety-first doneness check.",
-    "temperature": 180,
-    "minutes": 16,
+    "id": "seafood",
+    "name": "Seafood Mix",
+    "description": "Mixed seafood with quick high-heat finish.",
+    "temperature": 200,
+    "minutes": 8,
     "servings": 2,
-    "ingredient": "Chicken breast"
-  },
-  {
-    "name": "Sesame tofu bites",
-    "description": "Firm tofu cubes with a crisp edge and low-oil cooking guidance.",
-    "temperature": 185,
-    "minutes": 14,
-    "servings": 2,
-    "ingredient": "Tofu"
-  },
-  {
-    "name": "Colorful vegetable tray",
-    "description": "Mixed vegetables cut to even sizes for balanced airflow and color.",
-    "temperature": 175,
-    "minutes": 12,
-    "servings": 3,
-    "ingredient": "Mixed vegetables"
+    "ingredient": "Seafood mix",
+    "keywords": ["seafood", "shrimp", "fish", "mix", "healthy"],
+    "badge": "healthy",
+    "badgeLabel": "Healthy choice",
+    "image": "https://www.figma.com/api/mcp/asset/24c5963a-889f-4af7-8263-e7c38bbcc06e",
+    "tip": "Preheat for 2 minutes before cooking."
   }
 ]
