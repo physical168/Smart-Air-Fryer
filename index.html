@@ -37,10 +37,135 @@
       </header>
 
       <main id="main-content" class="app-main">
-        <section id="view-home" class="app-view is-active" data-view="home" aria-labelledby="home-placeholder-title" tabindex="-1">
-          <div class="view-placeholder">
-            <h2 id="home-placeholder-title" tabindex="-1">Home</h2>
-            <p>Search, quick actions, and popular foods — commit 3. Current route: <code id="route-debug">#home</code></p>
+        <section id="view-home" class="app-view is-active" data-view="home" aria-labelledby="home-hero-title" tabindex="-1">
+          <div class="home-screen">
+            <header class="home-hero">
+              <h1 id="home-hero-title" class="home-hero__title" tabindex="-1">
+                What are we <em class="home-hero__accent">cooking</em> today?
+              </h1>
+              <form class="home-search" role="search" aria-label="Search recipes or ingredients">
+                <label class="visually-hidden" for="home-search-input">Search recipes or ingredients</label>
+                <span class="home-search__icon" aria-hidden="true">
+                  <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
+                    <path d="M8 14a6 6 0 1 0 0-12 6 6 0 0 0 0 12Zm9.3 2.3-3.4-3.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <input
+                  id="home-search-input"
+                  class="home-search__input"
+                  type="search"
+                  name="q"
+                  placeholder="Search recipes or ingredients..."
+                  autocomplete="off"
+                />
+              </form>
+            </header>
+
+            <section class="home-quick-actions" aria-label="Quick actions">
+              <article class="quick-card quick-card--teal">
+                <span class="quick-card__icon quick-card__icon--spark" aria-hidden="true"></span>
+                <h2 class="quick-card__title">Quick Start</h2>
+                <p class="quick-card__text">Recommended based on your last 3 meals.</p>
+              </article>
+              <article class="quick-card quick-card--warm">
+                <span class="quick-card__icon quick-card__icon--timer" aria-hidden="true"></span>
+                <h2 class="quick-card__title">Preheat</h2>
+                <p class="quick-card__text">Ready in 3 minutes for crispiness.</p>
+              </article>
+            </section>
+
+            <section class="home-popular" aria-labelledby="popular-foods-title">
+              <div class="home-popular__head">
+                <div>
+                  <h2 id="popular-foods-title" class="home-popular__title">Popular Quick Foods</h2>
+                  <p class="home-popular__subtitle">One-tap presets for the lazy cook.</p>
+                </div>
+                <button type="button" class="home-popular__view-all">View All</button>
+              </div>
+
+              <ul class="food-card-list">
+                <li>
+                  <article class="food-card" data-food-id="galettes">
+                    <img
+                      class="food-card__image"
+                      src="https://www.figma.com/api/mcp/asset/8b2652d1-8751-4c8c-8501-0f59fe4dfb98"
+                      alt=""
+                      width="96"
+                      height="96"
+                    />
+                    <div class="food-card__body">
+                      <p class="food-card__badge">
+                        <span class="food-card__badge-icon food-card__badge-icon--preset" aria-hidden="true"></span>
+                        Preset available
+                      </p>
+                      <h3 class="food-card__name">French Galettes</h3>
+                      <p class="food-card__meta">
+                        <span><span class="food-card__meta-icon food-card__meta-icon--time" aria-hidden="true"></span>12m</span>
+                        <span><span class="food-card__meta-icon food-card__meta-icon--temp" aria-hidden="true"></span>180°C</span>
+                      </p>
+                    </div>
+                  </article>
+                </li>
+                <li>
+                  <article class="food-card" data-food-id="ham">
+                    <img
+                      class="food-card__image"
+                      src="https://www.figma.com/api/mcp/asset/b25c3aec-2a00-460d-960c-7e3f23f67456"
+                      alt=""
+                      width="96"
+                      height="96"
+                    />
+                    <div class="food-card__body">
+                      <p class="food-card__badge">
+                        <span class="food-card__badge-icon food-card__badge-icon--frozen" aria-hidden="true"></span>
+                        Frozen setting
+                      </p>
+                      <h3 class="food-card__name">Frozen Ham</h3>
+                      <p class="food-card__meta">
+                        <span><span class="food-card__meta-icon food-card__meta-icon--time" aria-hidden="true"></span>18m</span>
+                        <span><span class="food-card__meta-icon food-card__meta-icon--temp" aria-hidden="true"></span>165°C</span>
+                      </p>
+                    </div>
+                  </article>
+                </li>
+                <li>
+                  <article class="food-card" data-food-id="seafood">
+                    <img
+                      class="food-card__image"
+                      src="https://www.figma.com/api/mcp/asset/24c5963a-889f-4af7-8263-e7c38bbcc06e"
+                      alt=""
+                      width="96"
+                      height="96"
+                    />
+                    <div class="food-card__body">
+                      <p class="food-card__badge">
+                        <span class="food-card__badge-icon food-card__badge-icon--healthy" aria-hidden="true"></span>
+                        Healthy choice
+                      </p>
+                      <h3 class="food-card__name">Seafood Mix</h3>
+                      <p class="food-card__meta">
+                        <span><span class="food-card__meta-icon food-card__meta-icon--time" aria-hidden="true"></span>8m</span>
+                        <span><span class="food-card__meta-icon food-card__meta-icon--temp" aria-hidden="true"></span>200°C</span>
+                      </p>
+                    </div>
+                  </article>
+                </li>
+              </ul>
+            </section>
+
+            <aside class="home-tip" aria-label="Chef tip">
+              <span class="home-tip__label">Chef's tip</span>
+              <blockquote class="home-tip__quote">
+                <p>
+                  "Always pat your protein dry before air frying. Moisture is the enemy of a
+                  <span class="home-tip__highlight">perfect crunch</span>."
+                </p>
+              </blockquote>
+            </aside>
+
+            <button type="button" class="home-fab" aria-label="Add new item">
+              <span aria-hidden="true">+</span>
+            </button>
           </div>
         </section>
 

@@ -174,7 +174,7 @@ select:focus-visible {
   width: 100%;
   max-width: var(--content-max);
   margin: 0 auto;
-  padding: 6rem 1.5rem calc(var(--nav-h) + 2rem);
+  padding: 1.5rem 1.5rem calc(var(--nav-h) + 5rem);
 }
 
 /* Multi-view routing */
@@ -280,8 +280,333 @@ select:focus-visible {
   opacity: 0.7;
 }
 
+/* Home screen — Figma 36:2 */
+.home-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  position: relative;
+}
+
+.home-hero__title {
+  margin: 0 0 1.5rem;
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.9px;
+  color: var(--ink);
+}
+
+.home-hero__accent {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.home-search {
+  position: relative;
+  display: block;
+}
+
+.home-search__icon {
+  position: absolute;
+  left: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent);
+  pointer-events: none;
+}
+
+.home-search__input {
+  width: 100%;
+  min-height: 68px;
+  padding: 1.25rem 1.5rem 1.25rem 3.5rem;
+  border: 2px solid var(--border-input);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  font-family: inherit;
+  font-size: 1.125rem;
+  color: var(--ink);
+}
+
+.home-search__input::placeholder {
+  color: var(--muted-placeholder);
+}
+
+.home-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.quick-card {
+  margin: 0;
+  padding: 1.625rem;
+  border: 2px dashed;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quick-card--teal {
+  background: var(--accent-teal-bg);
+  border-color: var(--accent-teal-border);
+}
+
+.quick-card--warm {
+  background: var(--accent-warm-bg);
+  border-color: var(--accent-warm-border);
+}
+
+.quick-card__icon {
+  width: 25px;
+  height: 22px;
+  border-radius: 4px;
+  display: block;
+}
+
+.quick-card__icon--spark {
+  background: var(--accent-teal);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.quick-card__icon--timer {
+  width: 22px;
+  height: 26px;
+  border: 3px solid var(--accent);
+  border-radius: 50%;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+.quick-card__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.quick-card--teal .quick-card__title {
+  color: var(--accent-teal);
+}
+
+.quick-card--warm .quick-card__title {
+  color: var(--accent);
+}
+
+.quick-card__text {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.home-popular__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.home-popular__title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.home-popular__subtitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.home-popular__view-all {
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 0.5rem;
+  min-height: 44px;
+}
+
+.food-card-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.food-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.food-card__image {
+  flex-shrink: 0;
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  background: #eee;
+}
+
+.food-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.food-card__badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(172, 53, 9, 0.6);
+}
+
+.food-card__badge-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  background: currentColor;
+  opacity: 0.5;
+  border-radius: 2px;
+}
+
+.food-card__name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.food-card__meta {
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.food-card__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.food-card__meta-icon {
+  width: 12px;
+  height: 12px;
+  background: var(--muted);
+  opacity: 0.6;
+  border-radius: 2px;
+}
+
+.food-card__meta-icon--time {
+  border-radius: 50%;
+}
+
+.home-tip {
+  position: relative;
+  padding: 2.5rem 2rem 2rem;
+  background: var(--bg-tip);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.home-tip__label {
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent-coral);
+  color: #641800;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+}
+
+.home-tip__quote {
+  margin: 0;
+  font-size: 1.125rem;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.6;
+  color: rgba(26, 28, 28, 0.8);
+}
+
+.home-tip__quote p {
+  margin: 0;
+}
+
+.home-tip__highlight {
+  display: inline;
+  padding: 0 0.15em;
+  border-radius: 4px;
+  background: linear-gradient(transparent 60%, rgba(255, 112, 67, 0.35) 60%);
+}
+
+.home-fab {
+  position: fixed;
+  right: max(1.5rem, calc((100vw - var(--shell-max)) / 2 + 1.5rem));
+  bottom: calc(var(--nav-h) + 1.25rem);
+  z-index: 25;
+  width: 64px;
+  height: 64px;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--accent-coral);
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--shadow-fab);
+  display: none;
+}
+
+#view-home.is-active .home-fab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .home-quick-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .food-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .food-card__image {
+    width: 100%;
+    height: 140px;
+  }
+}
+
 @media (min-width: 768px) {
   .app-main {
-    padding-top: 5rem;
+    padding-top: 1.5rem;
   }
 }

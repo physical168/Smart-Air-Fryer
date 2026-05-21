@@ -63,18 +63,15 @@ function showView(viewId, options = {}) {
   updateDocumentTitle(viewId);
   document.documentElement.dataset.currentView = viewId;
 
-  const routeDebug = document.querySelector("#route-debug");
-  if (routeDebug) {
-    routeDebug.textContent = `#${viewId}`;
-  }
-
   if (updateHistory) {
     setHash(viewId, replaceHistory);
   }
 
   const activeSection = viewElements.get(viewId);
   if (activeSection) {
-    const heading = activeSection.querySelector("h2");
+    const heading =
+      activeSection.querySelector("h1[tabindex], h2[tabindex]") ||
+      activeSection.querySelector("h1, h2");
     if (heading) {
       heading.focus({ preventScroll: true });
     }
