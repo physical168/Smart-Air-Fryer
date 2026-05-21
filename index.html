@@ -3,9 +3,12 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="AtelierKitchen Smart Air Fryer helps students plan safer, healthier air fryer meals with accessible cooking guidance.">
-    <meta name="theme-color" content="#2f6f64">
-    <title>AtelierKitchen Smart Air Fryer</title>
+    <meta name="description" content="Atelier Kitchen Smart Air Fryer — one-tap presets for ready-made foods and air fryer settings.">
+    <meta name="theme-color" content="#ff7043">
+    <title>Atelier Kitchen · Smart Air Fryer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500;1,800&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
@@ -13,157 +16,80 @@
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
-    <header class="site-header">
-      <div class="brand-block">
-        <p class="eyebrow">AtelierKitchen</p>
-        <h1>Smart Air Fryer Assistant</h1>
-        <p class="tagline">Plan crisp, safer meals with guided presets and saved cooking preferences.</p>
-      </div>
-      <nav class="primary-nav" aria-label="Primary navigation">
-        <ul>
-          <li><a href="#dashboard" aria-current="page">Dashboard</a></li>
-          <li><a href="#assistant">Assistant</a></li>
-          <li><a href="#recipes">Recipes</a></li>
-          <li><a href="#safety">Safety</a></li>
+    <div class="app-shell">
+      <header class="app-header" aria-label="Site header">
+        <p class="app-header__brand">
+          <span class="app-header__mark" aria-hidden="true"></span>
+          Atelier Kitchen
+        </p>
+        <div class="app-header__actions" aria-hidden="true">
+          <!-- Profile & settings icons — commit 2 -->
+        </div>
+      </header>
+
+      <main id="main-content" class="app-main">
+        <section id="view-home" class="app-view is-active" data-view="home" aria-labelledby="home-placeholder-title">
+          <div class="view-placeholder">
+            <h2 id="home-placeholder-title">Home</h2>
+            <p>Search, quick actions, and popular foods — commit 3.</p>
+          </div>
+        </section>
+
+        <section id="view-detail" class="app-view" data-view="detail" aria-labelledby="detail-placeholder-title" hidden>
+          <div class="view-placeholder">
+            <h2 id="detail-placeholder-title">Cooking detail</h2>
+            <p>Temperature, time, and feedback — commits 5–6.</p>
+          </div>
+        </section>
+
+        <section id="view-shopping" class="app-view" data-view="shopping" aria-labelledby="shopping-placeholder-title" hidden>
+          <div class="view-placeholder">
+            <h2 id="shopping-placeholder-title">Shopping list</h2>
+            <p>Interactive inventory — commit 7.</p>
+          </div>
+        </section>
+
+        <section id="view-history" class="app-view" data-view="history" aria-labelledby="history-placeholder-title" hidden>
+          <div class="view-placeholder">
+            <h2 id="history-placeholder-title">History</h2>
+            <p>Culinary journey and saved cooks — commit 8.</p>
+          </div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <p>Smart Air Fryer Assistant · Figma-driven build</p>
+      </footer>
+
+      <nav class="bottom-nav" aria-label="Primary">
+        <ul class="bottom-nav__list">
+          <li>
+            <button type="button" class="bottom-nav__link is-active" data-nav="home" aria-current="page">
+              <span class="bottom-nav__icon" aria-hidden="true"></span>
+              Home
+            </button>
+          </li>
+          <li>
+            <button type="button" class="bottom-nav__link" data-nav="detail">
+              <span class="bottom-nav__icon" aria-hidden="true"></span>
+              Favorites
+            </button>
+          </li>
+          <li>
+            <button type="button" class="bottom-nav__link" data-nav="shopping">
+              <span class="bottom-nav__icon" aria-hidden="true"></span>
+              List
+            </button>
+          </li>
+          <li>
+            <button type="button" class="bottom-nav__link" data-nav="history">
+              <span class="bottom-nav__icon" aria-hidden="true"></span>
+              History
+            </button>
+          </li>
         </ul>
       </nav>
-    </header>
-
-    <main id="main-content">
-      <section id="dashboard" class="dashboard-section" aria-labelledby="dashboard-title">
-        <div class="dashboard-copy">
-          <p class="eyebrow">Current setup</p>
-          <h2 id="dashboard-title">Ready for your next cook</h2>
-          <p>
-            Choose an ingredient, portion size, and preferred texture. The assistant will suggest
-            a starting temperature, cooking time, and care reminders.
-          </p>
-          <ul class="metric-row" aria-label="Assistant highlights">
-            <li><strong>4</strong><span>preset families</span></li>
-            <li><strong>3</strong><span>texture modes</span></li>
-            <li><strong>44px</strong><span>touch targets</span></li>
-          </ul>
-        </div>
-        <aside class="device-panel" aria-label="Air fryer control preview">
-          <div class="device-screen">
-            <span class="screen-label">Smart Basket</span>
-            <strong>180</strong>
-            <span>degrees C</span>
-          </div>
-          <div class="device-controls" aria-hidden="true">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-        </aside>
-        <aside class="status-panel" aria-label="Air fryer status">
-          <dl>
-            <div>
-              <dt>Basket</dt>
-              <dd>Clean</dd>
-            </div>
-            <div>
-              <dt>Mode</dt>
-              <dd>Standby</dd>
-            </div>
-            <div>
-              <dt>Last saved</dt>
-              <dd id="last-saved">No saved preference</dd>
-            </div>
-          </dl>
-        </aside>
-      </section>
-
-      <section id="assistant" class="assistant-section" aria-labelledby="assistant-title">
-        <div class="section-heading">
-          <p class="eyebrow">Cooking assistant</p>
-          <h2 id="assistant-title">Build a cooking plan</h2>
-          <p id="assistant-description">Required inputs are ingredient, portion size, texture, and oil preference.</p>
-        </div>
-        <form id="cooking-form" class="cooking-form" aria-describedby="assistant-description" novalidate>
-          <div class="form-grid">
-            <div class="field-group">
-              <label for="ingredient">Main ingredient</label>
-              <select id="ingredient" name="ingredient">
-                <option value="potatoes">Potatoes</option>
-                <option value="chicken">Chicken breast</option>
-                <option value="tofu">Tofu</option>
-                <option value="vegetables">Mixed vegetables</option>
-              </select>
-            </div>
-            <div class="field-group">
-              <label for="portion">Portion size</label>
-              <input id="portion" name="portion" type="number" min="1" max="6" value="2" aria-describedby="portion-help portion-error" required>
-              <span id="portion-help" class="field-help">Choose between 1 and 6 portions.</span>
-              <span id="portion-error" class="field-error" aria-live="polite"></span>
-            </div>
-            <div class="field-group">
-              <label for="texture">Preferred texture</label>
-              <select id="texture" name="texture">
-                <option value="balanced">Balanced</option>
-                <option value="crispy">Extra crispy</option>
-                <option value="gentle">Gentle</option>
-              </select>
-            </div>
-            <div class="field-group">
-              <label for="oil">Oil preference</label>
-              <select id="oil" name="oil">
-                <option value="standard">Standard light coating</option>
-                <option value="low">Low oil</option>
-                <option value="none">No added oil</option>
-              </select>
-            </div>
-            <fieldset class="field-group checkbox-field">
-              <legend>Dietary notes</legend>
-              <label>
-                <input type="checkbox" name="dietary" value="gluten-free">
-                Gluten-free
-              </label>
-              <label>
-                <input type="checkbox" name="dietary" value="plant-based">
-                Plant-based
-              </label>
-            </fieldset>
-            <div class="field-group form-notes">
-              <label for="notes">Cooking notes</label>
-              <textarea id="notes" name="notes" rows="3" maxlength="120" placeholder="Example: cut smaller pieces, avoid spicy seasoning"></textarea>
-            </div>
-          </div>
-          <button type="submit">Create cooking plan</button>
-        </form>
-        <article id="plan-output" class="plan-output" aria-live="polite" aria-atomic="true">
-          <h3>Suggested plan</h3>
-          <p>Submit the form to generate your first smart air fryer recommendation.</p>
-        </article>
-      </section>
-
-      <section id="recipes" class="recipes-section" aria-labelledby="recipes-title">
-        <div class="section-heading">
-          <p class="eyebrow">Recipe presets</p>
-          <h2 id="recipes-title">Quick presets</h2>
-        </div>
-        <div id="recipe-list" class="recipe-list" aria-live="polite" aria-busy="true">
-          <p class="loading-message">Loading recipe presets...</p>
-        </div>
-      </section>
-
-      <section id="safety" class="safety-section" aria-labelledby="safety-title">
-        <div class="section-heading">
-          <p class="eyebrow">Care guidance</p>
-          <h2 id="safety-title">Safety reminders</h2>
-        </div>
-        <ul class="safety-list">
-          <li>Preheat only when the selected preset recommends it.</li>
-          <li>Keep the basket below the max fill line for even airflow.</li>
-          <li>Use a food thermometer for poultry and thick cuts.</li>
-        </ul>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <p>Smart Air Fryer Assistant for the AtelierKitchen coursework project.</p>
-      <a href="https://github.com/physical168/Smart-Air-Fryer">GitHub repository</a>
-    </footer>
+    </div>
 
     <script src="app.js" defer></script>
   </body>

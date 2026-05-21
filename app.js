@@ -1,161 +1,28 @@
-const cookingForm = document.querySelector("#cooking-form");
-const planOutput = document.querySelector("#plan-output");
-const portionInput = document.querySelector("#portion");
-const portionError = document.querySelector("#portion-error");
-const lastSaved = document.querySelector("#last-saved");
-const recipeList = document.querySelector("#recipe-list");
-const storageKey = "atelierKitchenCookingPreference";
+/**
+ * Smart Air Fryer Assistant — Figma-driven app shell.
+ * Commit 1: init only. Navigation and screen logic arrive in commits 2–8.
+ */
 
-const presets = {
-  potatoes: { temperature: 190, minutes: 18, reminder: "Shake the basket halfway through." },
-  chicken: { temperature: 180, minutes: 16, reminder: "Check the thickest part before serving." },
-  tofu: { temperature: 185, minutes: 14, reminder: "Pat dry before cooking for a firmer edge." },
-  vegetables: { temperature: 175, minutes: 12, reminder: "Cut pieces evenly so they finish together." }
-};
-
-function buildPlan(formData) {
-  const ingredient = formData.get("ingredient");
-  const portion = Number(formData.get("portion"));
-  const texture = formData.get("texture");
-  const oil = formData.get("oil");
-  const notes = formData.get("notes").trim();
-  const dietary = formData.getAll("dietary");
-  const preset = presets[ingredient];
-  const textureOffset = texture === "crispy" ? 3 : texture === "gentle" ? -2 : 0;
-  const portionOffset = Math.max(0, portion - 2) * 2;
-
-  return {
-    ingredient,
-    portion,
-    texture,
-    oil,
-    notes,
-    dietary,
-    temperature: preset.temperature,
-    minutes: preset.minutes + textureOffset + portionOffset,
-    reminder: preset.reminder
-  };
-}
-
-function validatePortion() {
-  const portion = Number(portionInput.value);
-  const isValid = Number.isInteger(portion) && portion >= 1 && portion <= 6;
-  portionInput.setAttribute("aria-invalid", String(!isValid));
-  portionError.textContent = isValid ? "" : "Enter a whole number from 1 to 6.";
-  return isValid;
-}
-
-function renderPlan(plan) {
-  const oilText = {
-    standard: "Use a light oil coating.",
-    low: "Use a small spray of oil.",
-    none: "Skip added oil and check texture halfway."
-  }[plan.oil];
-  const dietaryText = plan.dietary.length > 0 ? ` Dietary notes: ${plan.dietary.join(", ")}.` : "";
-  const notesText = plan.notes ? ` Notes: ${plan.notes}.` : "";
-
-  planOutput.innerHTML = `
-    <h3>Suggested plan</h3>
-    <p><strong>${plan.portion} portion(s) of ${plan.ingredient}</strong></p>
-    <p>Cook at ${plan.temperature} degrees C for ${plan.minutes} minutes. ${plan.reminder} ${oilText}${dietaryText}${notesText}</p>
-  `;
-}
-
-function savePlan(plan) {
-  const savedPlan = {
-    ...plan,
-    savedAt: new Date().toISOString()
-  };
-
-  localStorage.setItem(storageKey, JSON.stringify(savedPlan));
-  updateSavedStatus(savedPlan);
-}
-
-function updateSavedStatus(plan) {
-  const date = new Date(plan.savedAt);
-  lastSaved.textContent = `${plan.ingredient}, ${plan.portion} portion(s), ${date.toLocaleDateString()}`;
-}
-
-function restorePreference() {
-  const saved = localStorage.getItem(storageKey);
-
-  if (!saved) {
+function initApp() {
+  const homeView = document.querySelector("#view-home");
+  if (!homeView) {
     return;
   }
 
-  try {
-    const plan = JSON.parse(saved);
-    cookingForm.elements.ingredient.value = plan.ingredient;
-    cookingForm.elements.portion.value = plan.portion;
-    cookingForm.elements.texture.value = plan.texture;
-    cookingForm.elements.oil.value = plan.oil;
-    cookingForm.elements.notes.value = plan.notes || "";
-
-    cookingForm.querySelectorAll('input[name="dietary"]').forEach((checkbox) => {
-      checkbox.checked = plan.dietary.includes(checkbox.value);
-    });
-
-    renderPlan(plan);
-    updateSavedStatus(plan);
-  } catch (error) {
-    localStorage.removeItem(storageKey);
-  }
+  document.documentElement.dataset.appReady = "true";
 }
 
-function recipeCardTemplate(recipe) {
-  return `
-    <article class="recipe-card" itemscope itemtype="https://schema.org/Recipe">
-      <h3 itemprop="name">${recipe.name}</h3>
-      <p itemprop="description">${recipe.description}</p>
-      <p class="recipe-meta">
-        <span itemprop="recipeIngredient">${recipe.ingredient}</span>
-        <span aria-hidden="true"> · </span>
-        <span>${recipe.temperature} degrees C</span>
-        <span aria-hidden="true"> · </span>
-        <time itemprop="cookTime" datetime="PT${recipe.minutes}M">${recipe.minutes} minutes</time>
-        <span aria-hidden="true"> · </span>
-        <span itemprop="recipeYield">${recipe.servings} serving(s)</span>
-      </p>
-    </article>
-  `;
-}
-
-async function loadRecipes() {
-  try {
-    const response = await fetch("data/recipes.json");
-
-    if (!response.ok) {
-      throw new Error("Recipe data failed to load.");
-    }
-
-    const recipes = await response.json();
-    recipeList.innerHTML = recipes.map(recipeCardTemplate).join("");
-    recipeList.setAttribute("aria-busy", "false");
-  } catch (error) {
-    recipeList.innerHTML = `
-      <p class="loading-message">Recipe presets are unavailable. Please try again after refreshing the page.</p>
-    `;
-    recipeList.setAttribute("aria-busy", "false");
-  }
-}
-
-cookingForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  if (!validatePortion()) {
-    portionInput.focus();
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) {
     return;
   }
-  const plan = buildPlan(new FormData(cookingForm));
-  renderPlan(plan);
-  savePlan(plan);
-});
 
-portionInput.addEventListener("input", validatePortion);
-restorePreference();
-loadRecipes();
-
-if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js");
+    navigator.serviceWorker.register("service-worker.js").catch(() => {
+      /* PWA optional during scaffold phase */
+    });
   });
 }
+
+initApp();
+registerServiceWorker();
