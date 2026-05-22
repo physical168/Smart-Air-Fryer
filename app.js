@@ -163,24 +163,95 @@ function getHomeDisplayRecipes() {
     .filter(Boolean);
 }
 
+const HOME_HERO_DEFAULT_HTML =
+  'What are we <em class="home-hero__accent">cooking</em> today?';
+const HOME_POPULAR_DEFAULT = {
+  title: "Popular Quick Foods",
+  subtitle: "One-tap presets for the lazy cook."
+};
+
+function updateHomeFavoritesMode() {
+  const favoritedIds = getFavoritedFoodIds();
+  const isFavoritesView = homeShowsFavoritesOnly;
+  const isEmpty = isFavoritesView && favoritedIds.length === 0;
+
+  const screen = document.querySelector(".home-screen");
+  const heroTitle = document.querySelector("#home-hero-title");
+  const popularTitle = document.querySelector("#popular-foods-title");
+  const popularSubtitle = document.querySelector("#popular-foods-subtitle");
+  const popularHead = document.querySelector(".home-popular__head");
+  const emptyEl = document.querySelector("#home-favorites-empty");
+  const foodList = document.querySelector("#food-card-list");
+  const quickActions = document.querySelector(".home-quick-actions");
+  const homeTip = document.querySelector(".home-tip");
+  const searchForm = document.querySelector("#home-search-form");
+
+  screen?.classList.toggle("is-favorites-mode", isFavoritesView);
+
+  if (emptyEl) {
+    emptyEl.hidden = !isEmpty;
+  }
+
+  if (foodList) {
+    foodList.hidden = isEmpty;
+  }
+
+  if (quickActions) {
+    quickActions.hidden = isFavoritesView;
+  }
+
+  if (homeTip) {
+    homeTip.hidden = isFavoritesView;
+  }
+
+  if (searchForm) {
+    searchForm.hidden = isFavoritesView;
+  }
+
+  if (popularHead) {
+    popularHead.hidden = isEmpty;
+  }
+
+  if (heroTitle) {
+    heroTitle.innerHTML = isFavoritesView
+      ? 'Your <em class="home-hero__accent">favorites</em>'
+      : HOME_HERO_DEFAULT_HTML;
+    heroTitle.hidden = isEmpty;
+  }
+
+  if (popularTitle && popularSubtitle) {
+    if (isFavoritesView && !isEmpty) {
+      popularTitle.textContent = "Saved presets";
+      popularSubtitle.textContent = `${favoritedIds.length} favorite${favoritedIds.length === 1 ? "" : "s"} ready to cook.`;
+    } else if (!isFavoritesView) {
+      popularTitle.textContent = HOME_POPULAR_DEFAULT.title;
+      popularSubtitle.textContent = HOME_POPULAR_DEFAULT.subtitle;
+    }
+  }
+}
+
 function navigateToFavorites() {
   const favoritedIds = getFavoritedFoodIds();
 
   if (favoritedIds.length === 0) {
-    homeShowsFavoritesOnly = false;
-    showView("detail");
-    setDetailStatus("No favorites yet. Open a preset and tap Save to Favorites.", "error");
+    homeShowsFavoritesOnly = true;
+    showView("home");
+    updateHomeFavoritesMode();
+    renderFoodCards([]);
+    setSearchStatus("");
     return;
   }
 
   if (favoritedIds.length === 1) {
     homeShowsFavoritesOnly = false;
+    updateHomeFavoritesMode();
     showView("detail", { foodId: favoritedIds[0] });
     return;
   }
 
   homeShowsFavoritesOnly = true;
   showView("home");
+  updateHomeFavoritesMode();
   renderFoodCards(getHomeDisplayRecipes());
   setSearchStatus(`${favoritedIds.length} favorites shown.`, "success");
 }
@@ -1031,11 +1102,16 @@ function showView(viewId, options = {}) {
     renderHistoryList();
   }
 
-  if (viewId === "home" && !homeShowsFavoritesOnly) {
-    const searchInput = document.querySelector("#home-search-input");
-    if (searchInput && !searchInput.value.trim()) {
-      renderFoodCards(recipes);
-      setSearchStatus("");
+  if (viewId === "home") {
+    updateHomeFavoritesMode();
+    if (!homeShowsFavoritesOnly) {
+      const searchInput = document.querySelector("#home-search-input");
+      if (searchInput && !searchInput.value.trim()) {
+        renderFoodCards(recipes);
+        setSearchStatus("");
+      }
+    } else if (getFavoritedFoodIds().length > 0) {
+      renderFoodCards(getHomeDisplayRecipes());
     }
   }
 
@@ -1047,10 +1123,15 @@ function showView(viewId, options = {}) {
 
   const activeSection = viewElements.get(viewId);
   if (activeSection) {
-    const heading =
+    let heading =
       activeSection.querySelector("h1[tabindex], h2[tabindex]") ||
       activeSection.querySelector("h1, h2");
-    if (heading) {
+
+    if (viewId === "home" && homeShowsFavoritesOnly && getFavoritedFoodIds().length === 0) {
+      heading = document.querySelector("#home-favorites-empty-title") || heading;
+    }
+
+    if (heading && !heading.hidden) {
       heading.focus({ preventScroll: true });
     }
   }
@@ -1070,6 +1151,7 @@ function bindNavigation() {
       }
 
       homeShowsFavoritesOnly = false;
+      updateHomeFavoritesMode();
       showView(viewId);
     });
   });
@@ -1136,9 +1218,25 @@ function renderFoodCards(list) {
   }
 
   if (list.length === 0) {
-    container.innerHTML = `<li class="food-card-list__empty">No presets match your search.</li>`;
+    if (homeShowsFavoritesOnly && getFavoritedFoodIds().length === 0) {
+      container.innerHTML = "";
+      updateHomeFavoritesMode();
+    } else if (homeShowsFavoritesOnly) {
+      container.innerHTML =
+        `<li class="food-card-list__empty">No favorites match your search.</li>`;
+      const foodList = document.querySelector("#food-card-list");
+      if (foodList) {
+        foodList.hidden = false;
+      }
+    } else {
+      container.innerHTML = `<li class="food-card-list__empty">No presets match your search.</li>`;
+    }
     container.setAttribute("aria-busy", "false");
     return;
+  }
+
+  if (homeShowsFavoritesOnly) {
+    updateHomeFavoritesMode();
   }
 
   container.innerHTML = list.map(foodCardMarkup).join("");
@@ -1209,6 +1307,7 @@ function openFoodDetail(foodId) {
     return;
   }
   homeShowsFavoritesOnly = false;
+  updateHomeFavoritesMode();
   showView("detail", { foodId });
 }
 
@@ -1287,11 +1386,27 @@ function initHomeInteractions() {
   if (viewAllBtn) {
     viewAllBtn.addEventListener("click", () => {
       homeShowsFavoritesOnly = false;
+      updateHomeFavoritesMode();
       if (searchInput) {
         searchInput.value = "";
       }
       renderFoodCards(recipes);
       setSearchStatus("Showing all quick food presets.", "");
+      updateNavState("home");
+    });
+  }
+
+  const favoritesBrowseBtn = document.querySelector("#home-favorites-browse");
+  if (favoritesBrowseBtn) {
+    favoritesBrowseBtn.addEventListener("click", () => {
+      homeShowsFavoritesOnly = false;
+      updateHomeFavoritesMode();
+      if (searchInput) {
+        searchInput.value = "";
+      }
+      showView("home");
+      renderFoodCards(recipes);
+      setSearchStatus("");
       updateNavState("home");
     });
   }
@@ -1358,6 +1473,18 @@ function initDetailInteractions() {
         : "Save to Favorites";
 
       persistDetailParameters(activeDetailFoodId);
+
+      if (homeShowsFavoritesOnly) {
+        const favoritedIds = getFavoritedFoodIds();
+        updateHomeFavoritesMode();
+        renderFoodCards(getHomeDisplayRecipes());
+        setSearchStatus(
+          favoritedIds.length > 0
+            ? `${favoritedIds.length} favorite${favoritedIds.length === 1 ? "" : "s"} shown.`
+            : ""
+        );
+      }
+
       setDetailStatus(
         nextSaved ? "Preset saved to favorites." : "Removed from favorites.",
         "success"

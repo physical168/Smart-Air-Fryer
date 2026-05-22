@@ -59,13 +59,23 @@
               </button>
             </section>
 
-            <section class="home-popular" aria-labelledby="popular-foods-title">
+            <section id="home-popular-section" class="home-popular" aria-labelledby="popular-foods-title">
               <div class="home-popular__head">
                 <div>
                   <h2 id="popular-foods-title" class="home-popular__title">Popular Quick Foods</h2>
-                  <p class="home-popular__subtitle">One-tap presets for the lazy cook.</p>
+                  <p id="popular-foods-subtitle" class="home-popular__subtitle">One-tap presets for the lazy cook.</p>
                 </div>
                 <button type="button" class="home-popular__view-all">View All</button>
+              </div>
+
+              <div id="home-favorites-empty" class="home-favorites-empty" hidden>
+                <span class="home-favorites-empty__icon" aria-hidden="true">♡</span>
+                <h2 id="home-favorites-empty-title" class="home-favorites-empty__title" tabindex="-1">No favorites yet</h2>
+                <p class="home-favorites-empty__text">
+                  Open a preset from Home and tap <strong>Save to Favorites</strong> on the Detail screen.
+                  Your saved cooks will appear here.
+                </p>
+                <button type="button" class="home-favorites-empty__btn" id="home-favorites-browse">Browse presets</button>
               </div>
 
               <ul id="food-card-list" class="food-card-list" aria-live="polite" aria-busy="true">
