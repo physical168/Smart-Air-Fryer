@@ -1,6 +1,6 @@
 /**
  * Smart Air Fryer Assistant — Figma-driven app.
- * Commit 6: detail feedback form and ratings storage.
+ * Commit 7: shopping list screen with interactive inventory.
  */
 
 const VIEWS = ["home", "detail", "shopping", "history"];
@@ -8,6 +8,8 @@ const DEFAULT_VIEW = "home";
 const SELECTED_FOOD_KEY = "atelierKitchenSelectedFood";
 const PRESETS_STORAGE_KEY = "atelierKitchenFoodPresets";
 const RATINGS_STORAGE_KEY = "atelierKitchenFoodRatings";
+const SHOPPING_LIST_STORAGE_KEY = "atelierKitchenShoppingList";
+const PENDING_LIST_FOOD_KEY = "atelierKitchenPendingListFood";
 
 const viewElements = new Map();
 const navButtons = [];
@@ -28,7 +30,12 @@ const FALLBACK_RECIPES = [
     tip: "Flip once halfway for even crisping.",
     tagline: "Savory buckwheat crepes from Brittany",
     chefNote:
-      "The key to a perfect galette complétte is a high-heat sear followed by a gentle melt of the gruyère. Don't be afraid of the lacy edges—they're the best part."
+      "The key to a perfect galette complétte is a high-heat sear followed by a gentle melt of the gruyère. Don't be afraid of the lacy edges—they're the best part.",
+    shoppingItems: [
+      { label: "French galettes (frozen pack)", category: "Main" },
+      { label: "Gruyère cheese", category: "Dairy" },
+      { label: "Air fryer parchment liners", category: "Pantry" }
+    ]
   },
   {
     id: "ham",
@@ -45,7 +52,12 @@ const FALLBACK_RECIPES = [
     tip: "Use light oil spray to avoid drying.",
     tagline: "Frozen ham slices, crisp outside and juicy inside",
     chefNote:
-      "Pat slices dry before cooking. A light oil spray keeps the ham from drying while the edges crisp up."
+      "Pat slices dry before cooking. A light oil spray keeps the ham from drying while the edges crisp up.",
+    shoppingItems: [
+      { label: "Frozen ham slices", category: "Main" },
+      { label: "Light cooking oil spray", category: "Pantry" },
+      { label: "Paper towels", category: "Pantry" }
+    ]
   },
   {
     id: "seafood",
@@ -62,7 +74,12 @@ const FALLBACK_RECIPES = [
     tip: "Preheat for 2 minutes before cooking.",
     tagline: "Mixed seafood with a quick high-heat finish",
     chefNote:
-      "Preheat the basket for two minutes. Cook in a single layer and shake halfway for even color."
+      "Preheat the basket for two minutes. Cook in a single layer and shake halfway for even color.",
+    shoppingItems: [
+      { label: "Seafood mix (frozen)", category: "Main" },
+      { label: "Lemon wedges", category: "Produce" },
+      { label: "Fresh parsley", category: "Produce" }
+    ]
   }
 ];
 
@@ -405,6 +422,176 @@ function renderDetailScreen(foodId) {
   renderFeedbackForm(foodId);
 }
 
+function createShoppingItemId() {
+  return `item-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function readShoppingList() {
+  try {
+    const raw = localStorage.getItem(SHOPPING_LIST_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeShoppingList(items) {
+  localStorage.setItem(SHOPPING_LIST_STORAGE_KEY, JSON.stringify(items));
+}
+
+function buildTemplateItemsForFood(foodId) {
+  const recipe = recipesById.get(foodId);
+  if (!recipe || !recipe.shoppingItems) {
+    return [];
+  }
+
+  return recipe.shoppingItems.map((entry) => ({
+    id: createShoppingItemId(),
+    label: entry.label,
+    category: entry.category || "Pantry",
+    checked: false,
+    sourceFoodId: foodId,
+    addedAt: Date.now()
+  }));
+}
+
+function generateShoppingListFromFood(foodId) {
+  const recipe = recipesById.get(foodId);
+  if (!recipe) {
+    return null;
+  }
+
+  const incoming = buildTemplateItemsForFood(foodId);
+  const current = readShoppingList();
+  const existingKeys = new Set(
+    current.map((item) => `${item.sourceFoodId}:${item.label.toLowerCase()}`)
+  );
+  const merged = [...current];
+  let added = 0;
+
+  incoming.forEach((item) => {
+    const key = `${item.sourceFoodId}:${item.label.toLowerCase()}`;
+    if (!existingKeys.has(key)) {
+      merged.push(item);
+      existingKeys.add(key);
+      added += 1;
+    }
+  });
+
+  writeShoppingList(merged);
+  return { added, recipeName: recipe.name, total: merged.length };
+}
+
+function setShoppingStatus(message, type) {
+  const status = document.querySelector("#shopping-status");
+  if (!status) {
+    return;
+  }
+  status.textContent = message;
+  status.className = "shopping-status" + (type ? ` shopping-status--${type}` : "");
+}
+
+function updateShoppingProgress(items) {
+  const progress = document.querySelector("#shopping-progress");
+  if (!progress) {
+    return;
+  }
+
+  if (items.length === 0) {
+    progress.textContent = "";
+    return;
+  }
+
+  const checkedCount = items.filter((item) => item.checked).length;
+  progress.textContent = `${checkedCount} of ${items.length} items checked`;
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function renderShoppingList() {
+  const listEl = document.querySelector("#shopping-list");
+  const emptyEl = document.querySelector("#shopping-empty");
+  const subtitle = document.querySelector("#shopping-subtitle");
+  const toolbar = document.querySelector(".shopping-toolbar");
+
+  if (!listEl) {
+    return;
+  }
+
+  const items = readShoppingList();
+  updateShoppingProgress(items);
+
+  if (emptyEl) {
+    emptyEl.hidden = items.length > 0;
+  }
+
+  if (toolbar) {
+    toolbar.hidden = items.length === 0;
+  }
+
+  if (items.length === 0) {
+    listEl.innerHTML = "";
+    if (subtitle) {
+      subtitle.textContent = "Interactive inventory for your next cook";
+    }
+    return;
+  }
+
+  const sourceIds = [...new Set(items.map((item) => item.sourceFoodId).filter(Boolean))];
+  if (subtitle) {
+    if (sourceIds.length === 1) {
+      const recipe = recipesById.get(sourceIds[0]);
+      subtitle.textContent = recipe
+        ? `List for ${recipe.name}`
+        : "Interactive inventory for your next cook";
+    } else {
+      subtitle.textContent = "Combined list for your quick-food cooks";
+    }
+  }
+
+  listEl.innerHTML = items
+    .map((item) => {
+      const checkedClass = item.checked ? " shopping-item--checked" : "";
+      const checkedAttr = item.checked ? "checked" : "";
+      const safeLabel = escapeHtml(item.label);
+      const safeCategory = escapeHtml(item.category);
+      return `
+    <li class="shopping-item${checkedClass}" data-item-id="${item.id}">
+      <label class="shopping-item__label">
+        <input type="checkbox" class="shopping-item__check" ${checkedAttr} aria-label="Mark ${safeLabel} as purchased" />
+        <span class="shopping-item__body">
+          <span class="shopping-item__text">${safeLabel}</span>
+          <span class="shopping-item__category">${safeCategory}</span>
+        </span>
+      </label>
+      <button type="button" class="shopping-item__remove" data-remove-id="${item.id}" aria-label="Remove ${safeLabel}">×</button>
+    </li>
+  `;
+    })
+    .join("");
+}
+
+function updateShoppingItem(itemId, partial) {
+  const items = readShoppingList();
+  const index = items.findIndex((item) => item.id === itemId);
+  if (index === -1) {
+    return;
+  }
+  items[index] = { ...items[index], ...partial };
+  writeShoppingList(items);
+}
+
+function removeShoppingItem(itemId) {
+  writeShoppingList(readShoppingList().filter((item) => item.id !== itemId));
+}
+
 function showView(viewId, options = {}) {
   const { updateHistory = true, replaceHistory = false, foodId = null } = options;
 
@@ -428,6 +615,23 @@ function showView(viewId, options = {}) {
   if (viewId === "detail") {
     const activeFoodId = foodId || sessionStorage.getItem(SELECTED_FOOD_KEY);
     renderDetailScreen(activeFoodId);
+  }
+
+  if (viewId === "shopping") {
+    const pendingFoodId = sessionStorage.getItem(PENDING_LIST_FOOD_KEY);
+    if (pendingFoodId && recipesById.has(pendingFoodId)) {
+      const result = generateShoppingListFromFood(pendingFoodId);
+      sessionStorage.removeItem(PENDING_LIST_FOOD_KEY);
+      if (result) {
+        setShoppingStatus(
+          result.added > 0
+            ? `Added ${result.added} item${result.added === 1 ? "" : "s"} for ${result.recipeName}.`
+            : `Items for ${result.recipeName} are already on your list.`,
+          "success"
+        );
+      }
+    }
+    renderShoppingList();
   }
 
   updateDocumentTitle(viewId);
@@ -785,9 +989,66 @@ function initDetailInteractions() {
         return;
       }
       persistDetailParameters(activeDetailFoodId);
-      sessionStorage.setItem("atelierKitchenPendingListFood", activeDetailFoodId);
+      sessionStorage.setItem(PENDING_LIST_FOOD_KEY, activeDetailFoodId);
       setDetailStatus("Opening shopping list…", "success");
       showView("shopping");
+    });
+  }
+}
+
+function initShoppingInteractions() {
+  const listEl = document.querySelector("#shopping-list");
+  const clearCheckedBtn = document.querySelector("#shopping-clear-checked");
+  const clearAllBtn = document.querySelector("#shopping-clear-all");
+
+  if (listEl) {
+    listEl.addEventListener("change", (event) => {
+      const checkbox = event.target.closest(".shopping-item__check");
+      if (!checkbox) {
+        return;
+      }
+
+      const row = checkbox.closest(".shopping-item");
+      const itemId = row ? row.dataset.itemId : null;
+      if (!itemId) {
+        return;
+      }
+
+      updateShoppingItem(itemId, { checked: checkbox.checked });
+      renderShoppingList();
+      setShoppingStatus(checkbox.checked ? "Item marked as purchased." : "Item marked as needed.", "success");
+    });
+
+    listEl.addEventListener("click", (event) => {
+      const removeButton = event.target.closest("[data-remove-id]");
+      if (!removeButton) {
+        return;
+      }
+
+      removeShoppingItem(removeButton.dataset.removeId);
+      renderShoppingList();
+      setShoppingStatus("Item removed from your list.", "success");
+    });
+  }
+
+  if (clearCheckedBtn) {
+    clearCheckedBtn.addEventListener("click", () => {
+      const remaining = readShoppingList().filter((item) => !item.checked);
+      const removedCount = readShoppingList().length - remaining.length;
+      writeShoppingList(remaining);
+      renderShoppingList();
+      setShoppingStatus(
+        removedCount ? `Removed ${removedCount} checked item${removedCount === 1 ? "" : "s"}.` : "No checked items to clear.",
+        removedCount ? "success" : ""
+      );
+    });
+  }
+
+  if (clearAllBtn) {
+    clearAllBtn.addEventListener("click", () => {
+      writeShoppingList([]);
+      renderShoppingList();
+      setShoppingStatus("Shopping list cleared.", "success");
     });
   }
 }
@@ -853,6 +1114,7 @@ async function initApp() {
   initHomeInteractions();
   initDetailInteractions();
   initDetailFeedbackInteractions();
+  initShoppingInteractions();
   document.documentElement.dataset.appReady = "true";
 }
 

@@ -264,10 +264,26 @@
           </div>
         </section>
 
-        <section id="view-shopping" class="app-view" data-view="shopping" aria-labelledby="shopping-placeholder-title" hidden tabindex="-1">
-          <div class="view-placeholder">
-            <h2 id="shopping-placeholder-title" tabindex="-1">Shopping list</h2>
-            <p>Interactive inventory — commit 7.</p>
+        <section id="view-shopping" class="app-view" data-view="shopping" aria-labelledby="shopping-title" hidden tabindex="-1">
+          <div class="shopping-screen">
+            <header class="shopping-header">
+              <h2 id="shopping-title" class="shopping-header__title" tabindex="-1">Shopping List</h2>
+              <p id="shopping-subtitle" class="shopping-header__subtitle">Interactive inventory for your next cook</p>
+            </header>
+
+            <p id="shopping-progress" class="shopping-progress" aria-live="polite"></p>
+            <p id="shopping-status" class="shopping-status" role="status" aria-live="polite"></p>
+
+            <ul id="shopping-list" class="shopping-list" aria-label="Shopping list items"></ul>
+
+            <p id="shopping-empty" class="shopping-empty" hidden>
+              No items yet. Open a preset on Home and tap <strong>Generate Shopping List</strong>.
+            </p>
+
+            <div class="shopping-toolbar">
+              <button type="button" class="shopping-toolbar__btn" id="shopping-clear-checked">Clear checked</button>
+              <button type="button" class="shopping-toolbar__btn shopping-toolbar__btn--muted" id="shopping-clear-all">Clear all</button>
+            </div>
           </div>
         </section>
 
