@@ -172,6 +172,10 @@ select:focus-visible {
   padding: 1.5rem 1.5rem calc(var(--nav-h) + 5rem);
 }
 
+[hidden] {
+  display: none !important;
+}
+
 /* Multi-view routing */
 .app-view {
   display: none;
@@ -306,7 +310,7 @@ select:focus-visible {
 
 .home-quick-actions {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
   padding-top: 0.5rem;
 }
@@ -692,6 +696,12 @@ select:focus-visible {
   font-family: inherit;
   font-weight: 700;
   cursor: pointer;
+}
+
+#detail-content[hidden],
+#detail-empty[hidden],
+.detail-content:not(.is-populated) {
+  display: none !important;
 }
 
 .detail-content {

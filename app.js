@@ -90,6 +90,7 @@ let recipes = [];
 let recipesById = new Map();
 let recipesReady = false;
 let homeShowsFavoritesOnly = false;
+let pendingDetailFoodId = null;
 
 function getViewFromHash() {
   const hash = window.location.hash.replace("#", "").trim();
@@ -230,13 +231,55 @@ function updateHomeFavoritesMode() {
   }
 }
 
+function refreshHomeFoodCards() {
+  const searchInput = document.querySelector("#home-search-input");
+  const query = searchInput?.value.trim() || "";
+
+  if (!recipesReady || recipes.length === 0) {
+    return;
+  }
+
+  if (homeShowsFavoritesOnly) {
+    renderFoodCards(getHomeDisplayRecipes());
+    return;
+  }
+
+  if (!query) {
+    renderFoodCards(recipes);
+    return;
+  }
+
+  renderFoodCards(filterRecipes(query, recipes));
+}
+
+function resetToHomeBrowse(options = {}) {
+  const { statusMessage = "Showing all quick food presets.", statusType = "" } = options;
+  const searchInput = document.querySelector("#home-search-input");
+
+  homeShowsFavoritesOnly = false;
+  if (searchInput) {
+    searchInput.value = "";
+  }
+
+  updateHomeFavoritesMode();
+  showView("home");
+  refreshHomeFoodCards();
+  setSearchStatus(statusMessage, statusType);
+  updateNavState("home");
+
+  document.querySelector("#home-popular-section")?.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
 function navigateToFavorites() {
   const favoritedIds = getFavoritedFoodIds();
 
   if (favoritedIds.length === 0) {
     homeShowsFavoritesOnly = true;
-    showView("home");
     updateHomeFavoritesMode();
+    showView("home");
     renderFoodCards([]);
     setSearchStatus("");
     return;
@@ -440,6 +483,42 @@ function clampDetailInputs() {
   }
 }
 
+function isRenderableRecipe(recipe) {
+  if (!recipe) {
+    return false;
+  }
+
+  const temperature = Number(recipe.temperature);
+  const minutes = Number(recipe.minutes);
+  return Boolean(recipe.id && recipe.name && Number.isFinite(temperature) && Number.isFinite(minutes));
+}
+
+function resolveDetailFoodId(foodId) {
+  const candidate = foodId || sessionStorage.getItem(SELECTED_FOOD_KEY);
+  if (!candidate) {
+    return null;
+  }
+
+  const recipe = recipesById.get(candidate);
+  return isRenderableRecipe(recipe) ? candidate : null;
+}
+
+function hideDetailPanels() {
+  const emptyEl = document.querySelector("#detail-empty");
+  const contentEl = document.querySelector("#detail-content");
+
+  if (emptyEl) {
+    emptyEl.hidden = true;
+  }
+
+  if (contentEl) {
+    contentEl.hidden = true;
+    contentEl.classList.remove("is-populated");
+  }
+
+  activeDetailFoodId = null;
+}
+
 function persistDetailParameters(foodId) {
   if (!foodId) {
     return;
@@ -472,28 +551,30 @@ function persistDetailParameters(foodId) {
 function renderDetailScreen(foodId) {
   const emptyEl = document.querySelector("#detail-empty");
   const contentEl = document.querySelector("#detail-content");
-  const recipe = foodId ? recipesById.get(foodId) : null;
-
-  activeDetailFoodId = recipe ? foodId : null;
+  const resolvedId = resolveDetailFoodId(foodId);
+  const recipe = resolvedId ? recipesById.get(resolvedId) : null;
 
   if (!emptyEl || !contentEl) {
-    return;
+    return false;
   }
 
   if (!recipe) {
-    emptyEl.hidden = false;
-    contentEl.hidden = true;
+    hideDetailPanels();
     setDetailStatus("");
     renderFeedbackForm(null);
-    return;
+    return false;
   }
 
+  activeDetailFoodId = resolvedId;
   emptyEl.hidden = true;
   contentEl.hidden = false;
+  contentEl.classList.add("is-populated");
 
-  const saved = getPresetForFood(foodId);
-  const temperature = saved?.temperature ?? recipe.temperature;
-  const minutes = saved?.minutes ?? recipe.minutes;
+  const saved = getPresetForFood(resolvedId);
+  const savedTemp = Number(saved?.temperature);
+  const savedMinutes = Number(saved?.minutes);
+  const temperature = Number.isFinite(savedTemp) ? savedTemp : Number(recipe.temperature);
+  const minutes = Number.isFinite(savedMinutes) ? savedMinutes : Number(recipe.minutes);
   const favorited = Boolean(saved?.favorited);
 
   const heroImage = document.querySelector("#detail-hero-image");
@@ -541,7 +622,8 @@ function renderDetailScreen(foodId) {
     saved ? "success" : ""
   );
 
-  renderFeedbackForm(foodId);
+  renderFeedbackForm(resolvedId);
+  return true;
 }
 
 function createShoppingItemId() {
@@ -1063,7 +1145,31 @@ function showView(viewId, options = {}) {
     viewId = DEFAULT_VIEW;
   }
 
-  if (foodId) {
+  if (viewId === "detail") {
+    const candidate = foodId || sessionStorage.getItem(SELECTED_FOOD_KEY);
+    const resolvedId = resolveDetailFoodId(foodId);
+
+    if (!resolvedId) {
+      if (!recipesReady && candidate) {
+        pendingDetailFoodId = candidate;
+        viewId = "home";
+      } else {
+        sessionStorage.removeItem(SELECTED_FOOD_KEY);
+        hideDetailPanels();
+
+        if (getFavoritedFoodIds().length > 0) {
+          navigateToFavorites();
+          return;
+        }
+
+        homeShowsFavoritesOnly = false;
+        updateHomeFavoritesMode();
+        viewId = "home";
+      }
+    } else if (foodId) {
+      sessionStorage.setItem(SELECTED_FOOD_KEY, resolvedId);
+    }
+  } else if (foodId) {
     sessionStorage.setItem(SELECTED_FOOD_KEY, foodId);
   }
 
@@ -1077,8 +1183,12 @@ function showView(viewId, options = {}) {
   document.documentElement.dataset.currentView = viewId;
 
   if (viewId === "detail") {
-    const activeFoodId = foodId || sessionStorage.getItem(SELECTED_FOOD_KEY);
-    renderDetailScreen(activeFoodId);
+    const resolvedId = resolveDetailFoodId(foodId);
+    if (!resolvedId) {
+      hideDetailPanels();
+    } else {
+      renderDetailScreen(resolvedId);
+    }
   }
 
   if (viewId === "shopping") {
@@ -1104,14 +1214,12 @@ function showView(viewId, options = {}) {
 
   if (viewId === "home") {
     updateHomeFavoritesMode();
+    refreshHomeFoodCards();
     if (!homeShowsFavoritesOnly) {
       const searchInput = document.querySelector("#home-search-input");
       if (searchInput && !searchInput.value.trim()) {
-        renderFoodCards(recipes);
         setSearchStatus("");
       }
-    } else if (getFavoritedFoodIds().length > 0) {
-      renderFoodCards(getHomeDisplayRecipes());
     }
   }
 
@@ -1241,12 +1349,6 @@ function renderFoodCards(list) {
 
   container.innerHTML = list.map(foodCardMarkup).join("");
   container.setAttribute("aria-busy", "false");
-
-  container.querySelectorAll(".food-card[data-food-id]").forEach((button) => {
-    button.addEventListener("click", () => {
-      openFoodDetail(button.dataset.foodId);
-    });
-  });
 }
 
 function normalizeSearchText(value) {
@@ -1281,6 +1383,20 @@ function setRecipesData(list) {
   recipes = list;
   recipesById = new Map(recipes.map((recipe) => [recipe.id, recipe]));
   recipesReady = true;
+}
+
+function restorePendingDetailView() {
+  const pendingId = pendingDetailFoodId;
+  pendingDetailFoodId = null;
+
+  if (pendingId && resolveDetailFoodId(pendingId)) {
+    showView("detail", { foodId: pendingId, replaceHistory: true });
+    return;
+  }
+
+  if (document.documentElement.dataset.currentView === "detail" && !resolveDetailFoodId()) {
+    showView("home", { replaceHistory: true });
+  }
 }
 
 function filterRecipes(query, sourceList) {
@@ -1321,7 +1437,7 @@ function handleSearchSubmit(query) {
   const matches = filterRecipes(query, baseList);
 
   if (!query.trim()) {
-    renderFoodCards(baseList);
+    refreshHomeFoodCards();
     setSearchStatus(homeShowsFavoritesOnly ? `${baseList.length} favorites shown.` : "");
     return;
   }
@@ -1342,10 +1458,55 @@ function handleSearchSubmit(query) {
   setSearchStatus(`${matches.length} presets found. Tap a card or refine your search.`, "success");
 }
 
+function handleHomeViewClick(event) {
+  const browseBtn = event.target.closest("#home-favorites-browse");
+  if (browseBtn) {
+    event.preventDefault();
+    resetToHomeBrowse({ statusMessage: "", statusType: "" });
+    return;
+  }
+
+  const viewAllBtn = event.target.closest("#home-view-all-btn, .home-popular__view-all");
+  if (viewAllBtn) {
+    event.preventDefault();
+    if (!recipesReady) {
+      setSearchStatus("Presets are still loading. Please try again in a moment.", "error");
+      return;
+    }
+    resetToHomeBrowse();
+    return;
+  }
+
+  const quickStartBtn = event.target.closest("[data-quick-action='quick-start']");
+  if (quickStartBtn) {
+    event.preventDefault();
+    openFoodDetail("galettes");
+    return;
+  }
+
+  const preheatBtn = event.target.closest("[data-quick-action='preheat']");
+  if (preheatBtn) {
+    event.preventDefault();
+    setSearchStatus("Opening Seafood Mix — preheat the basket first.", "success");
+    openFoodDetail("seafood");
+    return;
+  }
+
+  const foodCard = event.target.closest(".food-card[data-food-id]");
+  if (foodCard) {
+    event.preventDefault();
+    openFoodDetail(foodCard.dataset.foodId);
+  }
+}
+
 function initHomeInteractions() {
+  const homeView = document.querySelector("#view-home");
   const searchForm = document.querySelector("#home-search-form");
   const searchInput = document.querySelector("#home-search-input");
-  const viewAllBtn = document.querySelector(".home-popular__view-all");
+
+  if (homeView) {
+    homeView.addEventListener("click", handleHomeViewClick);
+  }
 
   if (searchInput) {
     searchInput.addEventListener("input", () => {
@@ -1364,7 +1525,7 @@ function initHomeInteractions() {
           matches.length ? "" : "error"
         );
       } else {
-        setSearchStatus("");
+        setSearchStatus(homeShowsFavoritesOnly ? `${baseList.length} favorites shown.` : "");
       }
     });
   }
@@ -1374,40 +1535,6 @@ function initHomeInteractions() {
       event.preventDefault();
       const query = searchInput ? searchInput.value : "";
       handleSearchSubmit(query);
-    });
-  }
-
-  document.querySelectorAll("[data-quick-action='quick-start']").forEach((button) => {
-    button.addEventListener("click", () => {
-      openFoodDetail("galettes");
-    });
-  });
-
-  if (viewAllBtn) {
-    viewAllBtn.addEventListener("click", () => {
-      homeShowsFavoritesOnly = false;
-      updateHomeFavoritesMode();
-      if (searchInput) {
-        searchInput.value = "";
-      }
-      renderFoodCards(recipes);
-      setSearchStatus("Showing all quick food presets.", "");
-      updateNavState("home");
-    });
-  }
-
-  const favoritesBrowseBtn = document.querySelector("#home-favorites-browse");
-  if (favoritesBrowseBtn) {
-    favoritesBrowseBtn.addEventListener("click", () => {
-      homeShowsFavoritesOnly = false;
-      updateHomeFavoritesMode();
-      if (searchInput) {
-        searchInput.value = "";
-      }
-      showView("home");
-      renderFoodCards(recipes);
-      setSearchStatus("");
-      updateNavState("home");
     });
   }
 }
@@ -1425,9 +1552,11 @@ async function loadRecipes() {
     setRecipesData(data);
     renderFoodCards(recipes);
     setSearchStatus("");
+    restorePendingDetailView();
   } catch (error) {
     setRecipesData(FALLBACK_RECIPES);
     renderFoodCards(recipes);
+    restorePendingDetailView();
     const deployContext = getDeployContext();
     let fallbackMessage = "Using built-in presets (recipe file could not be loaded).";
 
@@ -1455,6 +1584,8 @@ function initDetailInteractions() {
 
   if (goHomeBtn) {
     goHomeBtn.addEventListener("click", () => {
+      homeShowsFavoritesOnly = false;
+      updateHomeFavoritesMode();
       showView("home");
     });
   }
@@ -1696,9 +1827,9 @@ async function initApp() {
     return;
   }
 
+  initHomeInteractions();
   initRouting();
   await loadRecipes();
-  initHomeInteractions();
   initDetailInteractions();
   initDetailFeedbackInteractions();
   initShoppingInteractions();
