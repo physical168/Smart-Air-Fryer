@@ -89,6 +89,7 @@ let deferredInstallPrompt = null;
 let recipes = [];
 let recipesById = new Map();
 let recipesReady = false;
+let homeShowsFavoritesOnly = false;
 
 function getViewFromHash() {
   const hash = window.location.hash.replace("#", "").trim();
@@ -117,6 +118,11 @@ function updateDocumentTitle(viewId) {
     return;
   }
 
+  if (viewId === "home" && homeShowsFavoritesOnly) {
+    document.title = "Atelier Kitchen · Favorites";
+    return;
+  }
+
   const titles = {
     home: "Atelier Kitchen · Home",
     detail: "Atelier Kitchen · Cooking detail",
@@ -129,10 +135,54 @@ function updateDocumentTitle(viewId) {
 
 function updateNavState(viewId) {
   navButtons.forEach((button) => {
-    const isActive = button.dataset.nav === viewId;
+    let isActive = button.dataset.nav === viewId;
+
+    if (viewId === "home" && homeShowsFavoritesOnly) {
+      isActive = button.dataset.nav === "detail";
+    }
+
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-current", isActive ? "page" : "false");
   });
+}
+
+function getFavoritedFoodIds() {
+  return Object.entries(readPresets())
+    .filter(([, preset]) => preset.favorited)
+    .map(([foodId]) => foodId)
+    .filter((foodId) => recipesById.has(foodId));
+}
+
+function getHomeDisplayRecipes() {
+  if (!homeShowsFavoritesOnly) {
+    return recipes;
+  }
+
+  return getFavoritedFoodIds()
+    .map((foodId) => recipesById.get(foodId))
+    .filter(Boolean);
+}
+
+function navigateToFavorites() {
+  const favoritedIds = getFavoritedFoodIds();
+
+  if (favoritedIds.length === 0) {
+    homeShowsFavoritesOnly = false;
+    showView("detail");
+    setDetailStatus("No favorites yet. Open a preset and tap Save to Favorites.", "error");
+    return;
+  }
+
+  if (favoritedIds.length === 1) {
+    homeShowsFavoritesOnly = false;
+    showView("detail", { foodId: favoritedIds[0] });
+    return;
+  }
+
+  homeShowsFavoritesOnly = true;
+  showView("home");
+  renderFoodCards(getHomeDisplayRecipes());
+  setSearchStatus(`${favoritedIds.length} favorites shown.`, "success");
 }
 
 function readPresets() {
@@ -981,6 +1031,14 @@ function showView(viewId, options = {}) {
     renderHistoryList();
   }
 
+  if (viewId === "home" && !homeShowsFavoritesOnly) {
+    const searchInput = document.querySelector("#home-search-input");
+    if (searchInput && !searchInput.value.trim()) {
+      renderFoodCards(recipes);
+      setSearchStatus("");
+    }
+  }
+
   updateDocumentTitle(viewId);
 
   if (updateHistory) {
@@ -1002,9 +1060,17 @@ function bindNavigation() {
   navButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const viewId = button.dataset.nav;
-      if (viewId) {
-        showView(viewId);
+      if (!viewId) {
+        return;
       }
+
+      if (viewId === "detail") {
+        navigateToFavorites();
+        return;
+      }
+
+      homeShowsFavoritesOnly = false;
+      showView(viewId);
     });
   });
 
@@ -1119,12 +1185,13 @@ function setRecipesData(list) {
   recipesReady = true;
 }
 
-function filterRecipes(query) {
+function filterRecipes(query, sourceList) {
+  const list = sourceList || recipes;
   const trimmed = query.trim();
   if (!trimmed) {
-    return [...recipes];
+    return [...list];
   }
-  return recipes.filter((recipe) => recipeMatchesQuery(recipe, trimmed));
+  return list.filter((recipe) => recipeMatchesQuery(recipe, trimmed));
 }
 
 function setSearchStatus(message, type) {
@@ -1141,6 +1208,7 @@ function openFoodDetail(foodId) {
     setSearchStatus("Preset not found. Try another search.", "error");
     return;
   }
+  homeShowsFavoritesOnly = false;
   showView("detail", { foodId });
 }
 
@@ -1150,11 +1218,12 @@ function handleSearchSubmit(query) {
     return;
   }
 
-  const matches = filterRecipes(query);
+  const baseList = getHomeDisplayRecipes();
+  const matches = filterRecipes(query, baseList);
 
   if (!query.trim()) {
-    renderFoodCards(recipes);
-    setSearchStatus("");
+    renderFoodCards(baseList);
+    setSearchStatus(homeShowsFavoritesOnly ? `${baseList.length} favorites shown.` : "");
     return;
   }
 
@@ -1185,7 +1254,8 @@ function initHomeInteractions() {
         setSearchStatus("Presets are still loading…", "");
         return;
       }
-      const matches = filterRecipes(searchInput.value);
+      const baseList = getHomeDisplayRecipes();
+      const matches = filterRecipes(searchInput.value, baseList);
       renderFoodCards(matches);
       if (searchInput.value.trim()) {
         setSearchStatus(
@@ -1223,11 +1293,13 @@ function initHomeInteractions() {
 
   if (viewAllBtn) {
     viewAllBtn.addEventListener("click", () => {
+      homeShowsFavoritesOnly = false;
       if (searchInput) {
         searchInput.value = "";
       }
       renderFoodCards(recipes);
       setSearchStatus("Showing all quick food presets.", "");
+      updateNavState("home");
     });
   }
 }

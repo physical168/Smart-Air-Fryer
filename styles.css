@@ -244,15 +244,17 @@ select:focus-visible {
 }
 
 .bottom-nav__icon {
+  display: block;
   width: 20px;
   height: 18px;
-  border-radius: 4px;
-  background: currentColor;
-  opacity: 0.35;
+  object-fit: contain;
+  opacity: 0.45;
+  filter: grayscale(1);
 }
 
 .bottom-nav__link.is-active .bottom-nav__icon {
-  opacity: 0.7;
+  opacity: 1;
+  filter: none;
 }
 
 /* Home screen — Figma 36:2 */
