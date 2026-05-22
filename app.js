@@ -1,12 +1,13 @@
 /**
  * Smart Air Fryer Assistant — Figma-driven app.
- * Commit 5: detail screen cooking parameters and saved presets.
+ * Commit 6: detail feedback form and ratings storage.
  */
 
 const VIEWS = ["home", "detail", "shopping", "history"];
 const DEFAULT_VIEW = "home";
 const SELECTED_FOOD_KEY = "atelierKitchenSelectedFood";
 const PRESETS_STORAGE_KEY = "atelierKitchenFoodPresets";
+const RATINGS_STORAGE_KEY = "atelierKitchenFoodRatings";
 
 const viewElements = new Map();
 const navButtons = [];
@@ -152,6 +153,135 @@ function setDetailStatus(message, type) {
   status.className = "detail-status" + (type ? ` detail-status--${type}` : "");
 }
 
+function setFeedbackStatus(message, type) {
+  const status = document.querySelector("#detail-feedback-status");
+  if (!status) {
+    return;
+  }
+  status.textContent = message;
+  status.className = "detail-feedback__status" + (type ? ` detail-feedback__status--${type}` : "");
+}
+
+function readRatings() {
+  try {
+    const raw = localStorage.getItem(RATINGS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeRatings(ratings) {
+  localStorage.setItem(RATINGS_STORAGE_KEY, JSON.stringify(ratings));
+}
+
+function getRatingForFood(foodId) {
+  return readRatings()[foodId] || null;
+}
+
+function saveRatingForFood(foodId, partial) {
+  const ratings = readRatings();
+  ratings[foodId] = {
+    ...ratings[foodId],
+    ...partial,
+    updatedAt: Date.now()
+  };
+  writeRatings(ratings);
+}
+
+function getStarRowsForField(field) {
+  return document.querySelectorAll(`.detail-star-row[data-rating-field="${field}"]`);
+}
+
+function setStarRowValue(row, value) {
+  const stars = row.querySelectorAll(".detail-star[data-star-value]");
+  stars.forEach((button) => {
+    const starValue = Number(button.dataset.starValue);
+    const isOn = starValue <= value;
+    button.classList.toggle("detail-star--on", isOn);
+    button.setAttribute("aria-pressed", isOn ? "true" : "false");
+  });
+  row.dataset.value = String(value);
+}
+
+function setRatingFieldValue(field, value) {
+  const clamped = Math.min(5, Math.max(0, value));
+  getStarRowsForField(field).forEach((row) => {
+    setStarRowValue(row, clamped);
+  });
+}
+
+function getRatingFieldValue(field) {
+  const row = document.querySelector(`.detail-star-row[data-rating-field="${field}"]`);
+  return row ? Number(row.dataset.value || 0) : 0;
+}
+
+function getSelectedFeedbackTag() {
+  const active = document.querySelector('.detail-feedback__tag[aria-pressed="true"]');
+  return active ? active.dataset.feedbackTag : "";
+}
+
+function setSelectedFeedbackTag(tag) {
+  document.querySelectorAll(".detail-feedback__tag").forEach((button) => {
+    const isActive = button.dataset.feedbackTag === tag;
+    button.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+}
+
+function clearFeedbackForm() {
+  setRatingFieldValue("crunchiness", 0);
+  setRatingFieldValue("satisfaction", 0);
+  setSelectedFeedbackTag("");
+  const note = document.querySelector("#detail-personal-note");
+  if (note) {
+    note.value = "";
+  }
+  setFeedbackStatus("");
+}
+
+function renderFeedbackForm(foodId) {
+  const saveBtn = document.querySelector("#detail-save-review");
+  const rating = foodId ? getRatingForFood(foodId) : null;
+
+  if (!foodId) {
+    clearFeedbackForm();
+    if (saveBtn) {
+      saveBtn.disabled = true;
+    }
+    return;
+  }
+
+  if (saveBtn) {
+    saveBtn.disabled = false;
+  }
+
+  setRatingFieldValue("crunchiness", rating?.crunchiness || 0);
+  setRatingFieldValue("satisfaction", rating?.satisfaction || 0);
+  setSelectedFeedbackTag(rating?.tag || "");
+
+  const note = document.querySelector("#detail-personal-note");
+  if (note) {
+    note.value = rating?.personalNote || "";
+  }
+
+  if (rating?.submittedAt) {
+    setFeedbackStatus("Previous review loaded. Update and save again anytime.", "success");
+  } else {
+    setFeedbackStatus("");
+  }
+}
+
+function getFeedbackMessage(crunchiness, satisfaction) {
+  const average = (crunchiness + satisfaction) / 2;
+  if (average < 3) {
+    return "Thanks for the honest feedback — we'll tune this preset.";
+  }
+  if (average >= 4.5) {
+    return "Glad it turned out great! Your review was saved.";
+  }
+  return "Review saved. Thanks for helping improve our presets.";
+}
+
 function clampDetailInputs() {
   const tempInput = document.querySelector("#detail-temperature");
   const minutesInput = document.querySelector("#detail-minutes");
@@ -215,6 +345,7 @@ function renderDetailScreen(foodId) {
     emptyEl.hidden = false;
     contentEl.hidden = true;
     setDetailStatus("");
+    renderFeedbackForm(null);
     return;
   }
 
@@ -270,6 +401,8 @@ function renderDetailScreen(foodId) {
     saved ? "Restored your saved settings for this preset." : "Recommended settings loaded.",
     saved ? "success" : ""
   );
+
+  renderFeedbackForm(foodId);
 }
 
 function showView(viewId, options = {}) {
@@ -659,6 +792,56 @@ function initDetailInteractions() {
   }
 }
 
+function initDetailFeedbackInteractions() {
+  document.querySelectorAll(".detail-star-row").forEach((row) => {
+    const field = row.dataset.ratingField;
+    row.querySelectorAll(".detail-star[data-star-value]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const value = Number(button.dataset.starValue);
+        setRatingFieldValue(field, value);
+        setFeedbackStatus("");
+      });
+    });
+  });
+
+  document.querySelectorAll(".detail-feedback__tag").forEach((button) => {
+    button.addEventListener("click", () => {
+      const isActive = button.getAttribute("aria-pressed") === "true";
+      setSelectedFeedbackTag(isActive ? "" : button.dataset.feedbackTag);
+      setFeedbackStatus("");
+    });
+  });
+
+  const saveReviewBtn = document.querySelector("#detail-save-review");
+  if (saveReviewBtn) {
+    saveReviewBtn.addEventListener("click", () => {
+      if (!activeDetailFoodId) {
+        setFeedbackStatus("Select a food preset before saving a review.", "error");
+        return;
+      }
+
+      const crunchiness = getRatingFieldValue("crunchiness");
+      const satisfaction = getRatingFieldValue("satisfaction");
+
+      if (crunchiness < 1 || satisfaction < 1) {
+        setFeedbackStatus("Please rate both crunchiness and overall satisfaction.", "error");
+        return;
+      }
+
+      const personalNote = document.querySelector("#detail-personal-note");
+      saveRatingForFood(activeDetailFoodId, {
+        crunchiness,
+        satisfaction,
+        tag: getSelectedFeedbackTag(),
+        personalNote: personalNote ? personalNote.value.trim() : "",
+        submittedAt: Date.now()
+      });
+
+      setFeedbackStatus(getFeedbackMessage(crunchiness, satisfaction), "success");
+    });
+  }
+}
+
 async function initApp() {
   if (!document.querySelector("#view-home")) {
     return;
@@ -669,6 +852,7 @@ async function initApp() {
   await loadRecipes();
   initHomeInteractions();
   initDetailInteractions();
+  initDetailFeedbackInteractions();
   document.documentElement.dataset.appReady = "true";
 }
 

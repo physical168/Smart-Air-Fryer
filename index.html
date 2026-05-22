@@ -171,15 +171,20 @@
                   <span class="detail-favorite__icon" aria-hidden="true"></span>
                   <span class="detail-favorite__text">Save to Favorites</span>
                 </button>
-                <div class="detail-rate-preview" aria-hidden="true">
-                  <span class="detail-rate-preview__label">Rate this setting</span>
-                  <span class="detail-rate-preview__stars" aria-hidden="true">
-                    <span class="detail-rate-preview__star detail-rate-preview__star--on"></span>
-                    <span class="detail-rate-preview__star detail-rate-preview__star--on"></span>
-                    <span class="detail-rate-preview__star detail-rate-preview__star--on"></span>
-                    <span class="detail-rate-preview__star detail-rate-preview__star--on"></span>
-                    <span class="detail-rate-preview__star"></span>
-                  </span>
+                <div class="detail-rate-setting">
+                  <span class="detail-rate-setting__label" id="detail-quick-rate-label">Rate this setting</span>
+                  <div
+                    class="detail-star-row"
+                    data-rating-field="satisfaction"
+                    role="radiogroup"
+                    aria-labelledby="detail-quick-rate-label"
+                  >
+                    <button type="button" class="detail-star" data-star-value="1" aria-label="1 star">★</button>
+                    <button type="button" class="detail-star" data-star-value="2" aria-label="2 stars">★</button>
+                    <button type="button" class="detail-star" data-star-value="3" aria-label="3 stars">★</button>
+                    <button type="button" class="detail-star" data-star-value="4" aria-label="4 stars">★</button>
+                    <button type="button" class="detail-star" data-star-value="5" aria-label="5 stars">★</button>
+                  </div>
                 </div>
               </div>
 
@@ -193,6 +198,65 @@
                   <span id="detail-notes-title">Chef's notes</span>
                 </div>
                 <p id="detail-chef-note" class="detail-notes__body"></p>
+              </section>
+
+              <section class="detail-feedback" id="detail-feedback" aria-labelledby="detail-feedback-title">
+                <h3 id="detail-feedback-title" class="detail-feedback__title">Rate Your Masterpiece</h3>
+
+                <div class="detail-feedback__ratings">
+                  <div class="detail-feedback__row">
+                    <span class="detail-feedback__row-label" id="detail-crunch-label">Crunchiness</span>
+                    <div
+                      class="detail-star-row"
+                      data-rating-field="crunchiness"
+                      role="radiogroup"
+                      aria-labelledby="detail-crunch-label"
+                    >
+                      <button type="button" class="detail-star" data-star-value="1" aria-label="1 star">★</button>
+                      <button type="button" class="detail-star" data-star-value="2" aria-label="2 stars">★</button>
+                      <button type="button" class="detail-star" data-star-value="3" aria-label="3 stars">★</button>
+                      <button type="button" class="detail-star" data-star-value="4" aria-label="4 stars">★</button>
+                      <button type="button" class="detail-star" data-star-value="5" aria-label="5 stars">★</button>
+                    </div>
+                  </div>
+                  <div class="detail-feedback__row">
+                    <span class="detail-feedback__row-label" id="detail-satisfaction-label">Overall Satisfaction</span>
+                    <div
+                      class="detail-star-row"
+                      data-rating-field="satisfaction"
+                      role="radiogroup"
+                      aria-labelledby="detail-satisfaction-label"
+                    >
+                      <button type="button" class="detail-star" data-star-value="1" aria-label="1 star">★</button>
+                      <button type="button" class="detail-star" data-star-value="2" aria-label="2 stars">★</button>
+                      <button type="button" class="detail-star" data-star-value="3" aria-label="3 stars">★</button>
+                      <button type="button" class="detail-star" data-star-value="4" aria-label="4 stars">★</button>
+                      <button type="button" class="detail-star" data-star-value="5" aria-label="5 stars">★</button>
+                    </div>
+                  </div>
+                </div>
+
+                <fieldset class="detail-feedback__tags">
+                  <legend class="detail-feedback__tags-label">Quick feedback</legend>
+                  <div class="detail-feedback__tag-list">
+                    <button type="button" class="detail-feedback__tag" data-feedback-tag="Perfectly Crispy">Perfectly Crispy</button>
+                    <button type="button" class="detail-feedback__tag" data-feedback-tag="Too Dry">Too Dry</button>
+                    <button type="button" class="detail-feedback__tag" data-feedback-tag="Juicy">Juicy</button>
+                  </div>
+                </fieldset>
+
+                <div class="detail-feedback__notes-field">
+                  <label class="detail-feedback__notes-label" for="detail-personal-note">Personal chef notes</label>
+                  <textarea
+                    id="detail-personal-note"
+                    class="detail-feedback__textarea"
+                    rows="4"
+                    placeholder="Adjusted the gruyère ratio this time..."
+                  ></textarea>
+                </div>
+
+                <button type="button" class="detail-feedback__submit" id="detail-save-review">Save Review</button>
+                <p id="detail-feedback-status" class="detail-feedback__status" role="status" aria-live="polite"></p>
               </section>
 
               <p id="detail-status" class="detail-status" role="status" aria-live="polite"></p>

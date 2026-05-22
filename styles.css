@@ -846,14 +846,14 @@ select:focus-visible {
   color: var(--accent-coral);
 }
 
-.detail-rate-preview {
+.detail-rate-setting {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 0.25rem;
 }
 
-.detail-rate-preview__label {
+.detail-rate-setting__label {
   font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -861,20 +861,175 @@ select:focus-visible {
   color: var(--muted);
 }
 
-.detail-rate-preview__stars {
+.detail-star-row {
   display: flex;
   gap: 0.25rem;
 }
 
-.detail-rate-preview__star {
-  width: 20px;
-  height: 19px;
-  background: var(--border-soft);
-  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+.detail-star {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem 0.35rem;
+  border: none;
+  background: transparent;
+  font-size: 1.35rem;
+  line-height: 1;
+  color: var(--border-soft);
+  cursor: pointer;
 }
 
-.detail-rate-preview__star--on {
-  background: var(--accent-coral);
+.detail-star:hover,
+.detail-star:focus-visible {
+  color: var(--accent-coral);
+}
+
+.detail-star--on {
+  color: var(--accent-coral);
+}
+
+.detail-feedback {
+  padding: 2rem 2.125rem;
+  border: 2px solid rgba(224, 191, 182, 0.2);
+  border-radius: 40px;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.detail-feedback__title {
+  margin: 0 0 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  color: var(--ink);
+}
+
+.detail-feedback__ratings {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.detail-feedback__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.detail-feedback__row-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.detail-feedback__tags {
+  margin: 0 0 1.5rem;
+  padding: 0;
+  border: none;
+}
+
+.detail-feedback__tags-label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.detail-feedback__tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.detail-feedback__tag {
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: var(--bg-tip);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.detail-feedback__tag[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: rgba(172, 53, 9, 0.05);
+  color: var(--muted);
+}
+
+.detail-feedback__notes-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-feedback__notes-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.detail-feedback__textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 1rem;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--bg-tip);
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--ink);
+  resize: vertical;
+}
+
+.detail-feedback__textarea::placeholder {
+  color: var(--muted-placeholder);
+}
+
+.detail-feedback__submit {
+  width: 100%;
+  min-height: 56px;
+  padding: 1rem;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.detail-feedback__submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.detail-feedback__status {
+  margin: 0.75rem 0 0;
+  min-height: 1.25rem;
+  font-size: 0.9rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+.detail-feedback__status--success {
+  color: var(--accent-teal);
+}
+
+.detail-feedback__status--error {
+  color: #b42318;
 }
 
 .detail-cta {
@@ -964,8 +1119,13 @@ select:focus-visible {
     align-items: stretch;
   }
 
-  .detail-rate-preview {
+  .detail-rate-setting {
     align-items: center;
+  }
+
+  .detail-feedback__row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .detail-control__input {
