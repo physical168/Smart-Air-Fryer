@@ -1278,16 +1278,9 @@ function initHomeInteractions() {
     });
   }
 
-  document.querySelectorAll("[data-quick-action]").forEach((button) => {
+  document.querySelectorAll("[data-quick-action='quick-start']").forEach((button) => {
     button.addEventListener("click", () => {
-      const action = button.dataset.quickAction;
-      if (action === "quick-start") {
-        openFoodDetail("galettes");
-        return;
-      }
-      if (action === "preheat") {
-        setSearchStatus("Preheat ready in 3 minutes. Start with your chosen preset.", "success");
-      }
+      openFoodDetail("galettes");
     });
   });
 
@@ -1335,25 +1328,6 @@ async function loadRecipes() {
     if (container) {
       container.setAttribute("aria-busy", "false");
     }
-  }
-}
-
-function initHeaderActions() {
-  const profileButton = document.querySelector("#header-profile");
-  const settingsButton = document.querySelector("#header-settings");
-
-  if (profileButton) {
-    profileButton.addEventListener("click", () => {
-      profileButton.setAttribute("aria-expanded", "true");
-      window.setTimeout(() => profileButton.setAttribute("aria-expanded", "false"), 150);
-    });
-  }
-
-  if (settingsButton) {
-    settingsButton.addEventListener("click", () => {
-      settingsButton.setAttribute("aria-expanded", "true");
-      window.setTimeout(() => settingsButton.setAttribute("aria-expanded", "false"), 150);
-    });
   }
 }
 
@@ -1596,7 +1570,6 @@ async function initApp() {
   }
 
   initRouting();
-  initHeaderActions();
   await loadRecipes();
   initHomeInteractions();
   initDetailInteractions();

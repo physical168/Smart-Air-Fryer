@@ -61,6 +61,22 @@ Best for coursework: teachers open one link, and PWA install works over HTTPS.
 
 Responsive layout, semantic HTML5, form interaction, AJAX (`recipes.json`), `localStorage` (presets, ratings, shopping list), PWA, and WCAG-oriented patterns (skip link, labels, `aria-live`, 44px targets, focus styles).
 
+## Web technologies (course rubric)
+
+This project is a kitchen preset assistant — it does **not** need maps, media playback, or drag-and-drop. The table below states what the rubric lists and whether this repo uses it.
+
+| Topic | Used? | Where / notes |
+|-------|:-----:|---------------|
+| **Map / Geolocation API** | No | No map embed, `navigator.geolocation`, or location-based features. |
+| **Audio / Video** | No | No `<audio>`, `<video>`, or Media APIs — only static images (e.g. recipe hero photos). |
+| **Form** | **Yes** | Home search: `<form id="home-search-form">` with `type="search"`. Detail: number inputs (temperature, duration), `<fieldset>` / star ratings, `<textarea>`, and save actions (wired in `app.js`). Shopping list uses checkbox inputs. |
+| **Semantic annotations** (RDFa, Microdata, Microformat) | No | No `itemscope` / `itemprop`, RDFa, or h-card markup. Structure uses **semantic HTML5** (`<main>`, `<section>`, `<article>`, `<nav>`, `<aside>`) plus **ARIA** where needed — not machine-readable schema vocabularies. |
+| **Drag and Drop** | No | List order is fixed; shopping items are toggled/deleted with buttons, not HTML5 drag-and-drop. |
+| **AJAX** | **Yes** | `fetch("data/recipes.json")` in `app.js` loads presets without a full page reload; search filters cards client-side after load. |
+| **PWA** (Progressive Web Application) | **Yes** | `manifest.json`, `service-worker.js` (cache + offline), `theme-color`, install UI on History (`beforeinstallprompt` / Safari “Add to Home Screen” copy). Deploy over HTTPS (e.g. GitHub Pages) for install and Lighthouse PWA checks. |
+
+**Summary for reports:** implement **Form**, **AJAX**, and **PWA**; explicitly note **Map/Geolocation**, **Audio/Video**, **RDFa/Microdata/Microformat**, and **Drag and Drop** as out of scope for this app (with brief justification above).
+
 ## Validation
 
 - [W3C HTML Validator](https://validator.w3.org/)

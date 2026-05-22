@@ -140,11 +140,6 @@ select:focus-visible {
   background: var(--accent-coral);
 }
 
-.app-header__actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
 
 .app-header__icon-btn {
   display: inline-flex;
@@ -311,7 +306,7 @@ select:focus-visible {
 
 .home-quick-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
   padding-top: 0.5rem;
 }
@@ -590,30 +585,6 @@ select:focus-visible {
   background: linear-gradient(transparent 60%, rgba(255, 112, 67, 0.35) 60%);
 }
 
-.home-fab {
-  position: fixed;
-  right: max(1.5rem, calc((100vw - var(--shell-max)) / 2 + 1.5rem));
-  bottom: calc(var(--nav-h) + 1.25rem);
-  z-index: 25;
-  width: 64px;
-  height: 64px;
-  border: none;
-  border-radius: var(--radius-lg);
-  background: var(--accent-coral);
-  color: #fff;
-  font-size: 2rem;
-  line-height: 1;
-  cursor: pointer;
-  box-shadow: var(--shadow-fab);
-  display: none;
-}
-
-#view-home.is-active .home-fab {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* Detail screen — Figma 36:152 */
 .detail-screen {
   display: flex;
@@ -822,21 +793,6 @@ select:focus-visible {
 
 .detail-favorite[aria-pressed="true"] .detail-favorite__icon::before {
   color: var(--accent-coral);
-}
-
-.detail-rate-setting {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.25rem;
-}
-
-.detail-rate-setting__label {
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
 }
 
 .detail-star-row {
@@ -1485,10 +1441,6 @@ select:focus-visible {
   .detail-actions {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .detail-rate-setting {
-    align-items: center;
   }
 
   .detail-feedback__row {

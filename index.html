@@ -23,18 +23,6 @@
           <span class="app-header__mark" aria-hidden="true"></span>
           Atelier Kitchen
         </p>
-        <div class="app-header__actions">
-          <button type="button" class="app-header__icon-btn" id="header-profile" aria-label="Profile" aria-expanded="false">
-            <svg class="app-header__icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path fill="currentColor" d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2.25c-4.28 0-7.75 2.36-7.75 5.25v.75h15.5v-.75c0-2.89-3.47-5.25-7.75-5.25Z"/>
-            </svg>
-          </button>
-          <button type="button" class="app-header__icon-btn" id="header-settings" aria-label="Settings" aria-expanded="false">
-            <svg class="app-header__icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path fill="currentColor" d="M12 8.25a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5Zm8.14 4.88.96.78a.75.75 0 0 1 .18.98l-.9 1.56a.75.75 0 0 1-.92.33l-1.14-.46a7.2 7.2 0 0 1-1.64 1.64l.46 1.14a.75.75 0 0 1-.33.92l-1.56.9a.75.75 0 0 1-.98-.18l-.78-.96a7.2 7.2 0 0 1-2.52 0l-.78.96a.75.75 0 0 1-.98.18l-1.56-.9a.75.75 0 0 1-.33-.92l.46-1.14a7.2 7.2 0 0 1-1.64-1.64l-1.14.46a.75.75 0 0 1-.92-.33l-.9-1.56a.75.75 0 0 1 .18-.98l.96-.78a7.2 7.2 0 0 1 0-2.52l-.96-.78a.75.75 0 0 1-.18-.98l.9-1.56a.75.75 0 0 1 .92-.33l1.14.46a7.2 7.2 0 0 1 1.64-1.64l-.46-1.14a.75.75 0 0 1 .33-.92l1.56-.9a.75.75 0 0 1 .98.18l.78.96c.82-.2 1.68-.2 2.52 0l.78-.96a.75.75 0 0 1 .98-.18l1.56.9a.75.75 0 0 1 .33.92l-.46 1.14c.47.5.9 1.06 1.24 1.64l1.14-.46a.75.75 0 0 1 .92.33l.9 1.56a.75.75 0 0 1-.18.98l-.96.78c.2.82.2 1.68 0 2.52Z"/>
-            </svg>
-          </button>
-        </div>
       </header>
 
       <main id="main-content" class="app-main">
@@ -69,11 +57,6 @@
                 <h2 class="quick-card__title">Quick Start</h2>
                 <p class="quick-card__text">Recommended based on your last 3 meals.</p>
               </button>
-              <button type="button" class="quick-card quick-card--warm" data-quick-action="preheat">
-                <span class="quick-card__icon quick-card__icon--timer" aria-hidden="true"></span>
-                <h2 class="quick-card__title">Preheat</h2>
-                <p class="quick-card__text">Ready in 3 minutes for crispiness.</p>
-              </button>
             </section>
 
             <section class="home-popular" aria-labelledby="popular-foods-title">
@@ -100,9 +83,6 @@
               </blockquote>
             </aside>
 
-            <button type="button" class="home-fab" aria-label="Add new item">
-              <span aria-hidden="true">+</span>
-            </button>
           </div>
         </section>
 
@@ -172,21 +152,6 @@
                   <span class="detail-favorite__icon" aria-hidden="true"></span>
                   <span class="detail-favorite__text">Save to Favorites</span>
                 </button>
-                <div class="detail-rate-setting">
-                  <span class="detail-rate-setting__label" id="detail-quick-rate-label">Rate this setting</span>
-                  <div
-                    class="detail-star-row"
-                    data-rating-field="satisfaction"
-                    role="radiogroup"
-                    aria-labelledby="detail-quick-rate-label"
-                  >
-                    <button type="button" class="detail-star" data-star-value="1" aria-label="1 star">★</button>
-                    <button type="button" class="detail-star" data-star-value="2" aria-label="2 stars">★</button>
-                    <button type="button" class="detail-star" data-star-value="3" aria-label="3 stars">★</button>
-                    <button type="button" class="detail-star" data-star-value="4" aria-label="4 stars">★</button>
-                    <button type="button" class="detail-star" data-star-value="5" aria-label="5 stars">★</button>
-                  </div>
-                </div>
               </div>
 
               <button type="button" class="detail-cta" id="detail-shopping-list">
