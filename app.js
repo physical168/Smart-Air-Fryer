@@ -1,11 +1,12 @@
 /**
  * Smart Air Fryer Assistant — Figma-driven app.
- * Commit 4: home search, recipe AJAX, navigation to detail.
+ * Commit 5: detail screen cooking parameters and saved presets.
  */
 
 const VIEWS = ["home", "detail", "shopping", "history"];
 const DEFAULT_VIEW = "home";
 const SELECTED_FOOD_KEY = "atelierKitchenSelectedFood";
+const PRESETS_STORAGE_KEY = "atelierKitchenFoodPresets";
 
 const viewElements = new Map();
 const navButtons = [];
@@ -23,7 +24,10 @@ const FALLBACK_RECIPES = [
     badge: "preset",
     badgeLabel: "Preset available",
     image: "https://www.figma.com/api/mcp/asset/8b2652d1-8751-4c8c-8501-0f59fe4dfb98",
-    tip: "Flip once halfway for even crisping."
+    tip: "Flip once halfway for even crisping.",
+    tagline: "Savory buckwheat crepes from Brittany",
+    chefNote:
+      "The key to a perfect galette complétte is a high-heat sear followed by a gentle melt of the gruyère. Don't be afraid of the lacy edges—they're the best part."
   },
   {
     id: "ham",
@@ -37,7 +41,10 @@ const FALLBACK_RECIPES = [
     badge: "frozen",
     badgeLabel: "Frozen setting",
     image: "https://www.figma.com/api/mcp/asset/b25c3aec-2a00-460d-960c-7e3f23f67456",
-    tip: "Use light oil spray to avoid drying."
+    tip: "Use light oil spray to avoid drying.",
+    tagline: "Frozen ham slices, crisp outside and juicy inside",
+    chefNote:
+      "Pat slices dry before cooking. A light oil spray keeps the ham from drying while the edges crisp up."
   },
   {
     id: "seafood",
@@ -51,9 +58,14 @@ const FALLBACK_RECIPES = [
     badge: "healthy",
     badgeLabel: "Healthy choice",
     image: "https://www.figma.com/api/mcp/asset/24c5963a-889f-4af7-8263-e7c38bbcc06e",
-    tip: "Preheat for 2 minutes before cooking."
+    tip: "Preheat for 2 minutes before cooking.",
+    tagline: "Mixed seafood with a quick high-heat finish",
+    chefNote:
+      "Preheat the basket for two minutes. Cook in a single layer and shake halfway for even color."
   }
 ];
+
+let activeDetailFoodId = null;
 
 let recipes = [];
 let recipesById = new Map();
@@ -104,39 +116,160 @@ function updateNavState(viewId) {
   });
 }
 
-function renderDetailSelection(foodId) {
-  const textEl = document.querySelector("#detail-selection-text");
-  const metaEl = document.querySelector("#detail-selection-meta");
+function readPresets() {
+  try {
+    const raw = localStorage.getItem(PRESETS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
 
-  if (!textEl || !metaEl) {
+function writePresets(presets) {
+  localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(presets));
+}
+
+function getPresetForFood(foodId) {
+  return readPresets()[foodId] || null;
+}
+
+function savePresetForFood(foodId, partial) {
+  const presets = readPresets();
+  presets[foodId] = {
+    ...presets[foodId],
+    ...partial,
+    updatedAt: Date.now()
+  };
+  writePresets(presets);
+}
+
+function setDetailStatus(message, type) {
+  const status = document.querySelector("#detail-status");
+  if (!status) {
+    return;
+  }
+  status.textContent = message;
+  status.className = "detail-status" + (type ? ` detail-status--${type}` : "");
+}
+
+function clampDetailInputs() {
+  const tempInput = document.querySelector("#detail-temperature");
+  const minutesInput = document.querySelector("#detail-minutes");
+
+  if (tempInput) {
+    const temp = Number(tempInput.value);
+    if (Number.isFinite(temp)) {
+      tempInput.value = String(Math.min(250, Math.max(80, temp)));
+    }
+  }
+
+  if (minutesInput) {
+    const mins = Number(minutesInput.value);
+    if (Number.isFinite(mins)) {
+      minutesInput.value = String(Math.min(120, Math.max(1, mins)));
+    }
+  }
+}
+
+function persistDetailParameters(foodId) {
+  if (!foodId) {
     return;
   }
 
+  clampDetailInputs();
+
+  const tempInput = document.querySelector("#detail-temperature");
+  const minutesInput = document.querySelector("#detail-minutes");
+  const favoriteBtn = document.querySelector("#detail-save-favorite");
+
+  if (!tempInput || !minutesInput) {
+    return;
+  }
+
+  const temperature = Number(tempInput.value);
+  const minutes = Number(minutesInput.value);
+
+  if (!Number.isFinite(temperature) || !Number.isFinite(minutes)) {
+    return;
+  }
+
+  savePresetForFood(foodId, {
+    temperature,
+    minutes,
+    favorited: favoriteBtn ? favoriteBtn.getAttribute("aria-pressed") === "true" : false
+  });
+}
+
+function renderDetailScreen(foodId) {
+  const emptyEl = document.querySelector("#detail-empty");
+  const contentEl = document.querySelector("#detail-content");
   const recipe = foodId ? recipesById.get(foodId) : null;
 
-  if (!recipe) {
-    textEl.textContent = "Select a food from Home to see parameters.";
-    metaEl.hidden = true;
-    metaEl.innerHTML = "";
+  activeDetailFoodId = recipe ? foodId : null;
+
+  if (!emptyEl || !contentEl) {
     return;
   }
 
-  textEl.textContent = `${recipe.name} — recommended air fryer settings`;
-  metaEl.hidden = false;
-  metaEl.innerHTML = `
-    <div>
-      <dt>Temperature</dt>
-      <dd>${recipe.temperature}°C</dd>
-    </div>
-    <div>
-      <dt>Time</dt>
-      <dd>${recipe.minutes} min</dd>
-    </div>
-    <div>
-      <dt>Tip</dt>
-      <dd>${recipe.tip}</dd>
-    </div>
-  `;
+  if (!recipe) {
+    emptyEl.hidden = false;
+    contentEl.hidden = true;
+    setDetailStatus("");
+    return;
+  }
+
+  emptyEl.hidden = true;
+  contentEl.hidden = false;
+
+  const saved = getPresetForFood(foodId);
+  const temperature = saved?.temperature ?? recipe.temperature;
+  const minutes = saved?.minutes ?? recipe.minutes;
+  const favorited = Boolean(saved?.favorited);
+
+  const heroImage = document.querySelector("#detail-hero-image");
+  const titleEl = document.querySelector("#detail-title");
+  const taglineEl = document.querySelector("#detail-tagline");
+  const tempInput = document.querySelector("#detail-temperature");
+  const minutesInput = document.querySelector("#detail-minutes");
+  const favoriteBtn = document.querySelector("#detail-save-favorite");
+  const chefNoteEl = document.querySelector("#detail-chef-note");
+
+  if (heroImage) {
+    heroImage.src = recipe.image;
+    heroImage.alt = recipe.name;
+  }
+
+  if (titleEl) {
+    titleEl.textContent = recipe.name;
+  }
+
+  if (taglineEl) {
+    taglineEl.textContent = recipe.tagline || recipe.description;
+  }
+
+  if (tempInput) {
+    tempInput.value = String(temperature);
+  }
+
+  if (minutesInput) {
+    minutesInput.value = String(minutes);
+  }
+
+  if (favoriteBtn) {
+    favoriteBtn.setAttribute("aria-pressed", favorited ? "true" : "false");
+    favoriteBtn.querySelector(".detail-favorite__text").textContent = favorited
+      ? "Saved to Favorites"
+      : "Save to Favorites";
+  }
+
+  if (chefNoteEl) {
+    chefNoteEl.textContent = recipe.chefNote || recipe.tip;
+  }
+
+  setDetailStatus(
+    saved ? "Restored your saved settings for this preset." : "Recommended settings loaded.",
+    saved ? "success" : ""
+  );
 }
 
 function showView(viewId, options = {}) {
@@ -161,7 +294,7 @@ function showView(viewId, options = {}) {
 
   if (viewId === "detail") {
     const activeFoodId = foodId || sessionStorage.getItem(SELECTED_FOOD_KEY);
-    renderDetailSelection(activeFoodId);
+    renderDetailScreen(activeFoodId);
   }
 
   updateDocumentTitle(viewId);
@@ -462,6 +595,70 @@ function initHeaderActions() {
   }
 }
 
+function initDetailInteractions() {
+  const goHomeBtn = document.querySelector("#detail-go-home");
+  const favoriteBtn = document.querySelector("#detail-save-favorite");
+  const shoppingBtn = document.querySelector("#detail-shopping-list");
+  const tempInput = document.querySelector("#detail-temperature");
+  const minutesInput = document.querySelector("#detail-minutes");
+
+  if (goHomeBtn) {
+    goHomeBtn.addEventListener("click", () => {
+      showView("home");
+    });
+  }
+
+  if (favoriteBtn) {
+    favoriteBtn.addEventListener("click", () => {
+      if (!activeDetailFoodId) {
+        return;
+      }
+
+      const isSaved = favoriteBtn.getAttribute("aria-pressed") === "true";
+      const nextSaved = !isSaved;
+      favoriteBtn.setAttribute("aria-pressed", nextSaved ? "true" : "false");
+      favoriteBtn.querySelector(".detail-favorite__text").textContent = nextSaved
+        ? "Saved to Favorites"
+        : "Save to Favorites";
+
+      persistDetailParameters(activeDetailFoodId);
+      setDetailStatus(
+        nextSaved ? "Preset saved to favorites." : "Removed from favorites.",
+        "success"
+      );
+    });
+  }
+
+  const onParameterChange = () => {
+    if (!activeDetailFoodId) {
+      return;
+    }
+    persistDetailParameters(activeDetailFoodId);
+    setDetailStatus("Settings updated.", "success");
+  };
+
+  if (tempInput) {
+    tempInput.addEventListener("change", onParameterChange);
+  }
+
+  if (minutesInput) {
+    minutesInput.addEventListener("change", onParameterChange);
+  }
+
+  if (shoppingBtn) {
+    shoppingBtn.addEventListener("click", () => {
+      if (!activeDetailFoodId) {
+        setDetailStatus("Select a food preset first.", "error");
+        return;
+      }
+      persistDetailParameters(activeDetailFoodId);
+      sessionStorage.setItem("atelierKitchenPendingListFood", activeDetailFoodId);
+      setDetailStatus("Opening shopping list…", "success");
+      showView("shopping");
+    });
+  }
+}
+
 async function initApp() {
   if (!document.querySelector("#view-home")) {
     return;
@@ -471,6 +668,7 @@ async function initApp() {
   initHeaderActions();
   await loadRecipes();
   initHomeInteractions();
+  initDetailInteractions();
   document.documentElement.dataset.appReady = "true";
 }
 

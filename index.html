@@ -105,12 +105,98 @@
           </div>
         </section>
 
-        <section id="view-detail" class="app-view" data-view="detail" aria-labelledby="detail-placeholder-title" hidden tabindex="-1">
-          <div class="view-placeholder detail-panel">
-            <h2 id="detail-placeholder-title" tabindex="-1">Cooking detail</h2>
-            <p id="detail-selection-text">Select a food from Home to see parameters.</p>
-            <dl id="detail-selection-meta" class="detail-panel__meta" hidden></dl>
-            <p class="detail-panel__note">Full parameter controls — commit 5.</p>
+        <section id="view-detail" class="app-view" data-view="detail" aria-labelledby="detail-title" hidden tabindex="-1">
+          <div class="detail-screen">
+            <div id="detail-empty" class="detail-empty">
+              <h2 id="detail-empty-title" class="detail-empty__title" tabindex="-1">Cooking detail</h2>
+              <p class="detail-empty__text">Select a food from Home to see air fryer parameters.</p>
+              <button type="button" class="detail-empty__btn" id="detail-go-home">Back to Home</button>
+            </div>
+
+            <article id="detail-content" class="detail-content" hidden>
+              <header class="detail-hero">
+                <div class="detail-hero__frame">
+                  <img
+                    id="detail-hero-image"
+                    class="detail-hero__image"
+                    src=""
+                    alt=""
+                    width="624"
+                    height="468"
+                  />
+                </div>
+                <h2 id="detail-title" class="detail-hero__title" tabindex="-1"></h2>
+                <p id="detail-tagline" class="detail-hero__tagline"></p>
+              </header>
+
+              <div class="detail-controls" aria-label="Cooking parameters">
+                <div class="detail-control detail-control--temp">
+                  <span class="detail-control__icon detail-control__icon--temp" aria-hidden="true"></span>
+                  <span class="detail-control__label" id="detail-temp-label">Temperature</span>
+                  <div class="detail-control__value-row">
+                    <input
+                      id="detail-temperature"
+                      class="detail-control__input"
+                      type="number"
+                      min="80"
+                      max="250"
+                      step="5"
+                      inputmode="numeric"
+                      aria-labelledby="detail-temp-label"
+                    />
+                    <span class="detail-control__unit" aria-hidden="true">°C</span>
+                  </div>
+                </div>
+                <div class="detail-control detail-control--time">
+                  <span class="detail-control__icon detail-control__icon--time" aria-hidden="true"></span>
+                  <span class="detail-control__label" id="detail-time-label">Duration</span>
+                  <div class="detail-control__value-row">
+                    <input
+                      id="detail-minutes"
+                      class="detail-control__input"
+                      type="number"
+                      min="1"
+                      max="120"
+                      step="1"
+                      inputmode="numeric"
+                      aria-labelledby="detail-time-label"
+                    />
+                    <span class="detail-control__unit" aria-hidden="true">mins</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detail-actions">
+                <button type="button" class="detail-favorite" id="detail-save-favorite" aria-pressed="false">
+                  <span class="detail-favorite__icon" aria-hidden="true"></span>
+                  <span class="detail-favorite__text">Save to Favorites</span>
+                </button>
+                <div class="detail-rate-preview" aria-hidden="true">
+                  <span class="detail-rate-preview__label">Rate this setting</span>
+                  <span class="detail-rate-preview__stars" aria-hidden="true">
+                    <span class="detail-rate-preview__star detail-rate-preview__star--on"></span>
+                    <span class="detail-rate-preview__star detail-rate-preview__star--on"></span>
+                    <span class="detail-rate-preview__star detail-rate-preview__star--on"></span>
+                    <span class="detail-rate-preview__star detail-rate-preview__star--on"></span>
+                    <span class="detail-rate-preview__star"></span>
+                  </span>
+                </div>
+              </div>
+
+              <button type="button" class="detail-cta" id="detail-shopping-list">
+                <span class="detail-cta__icon" aria-hidden="true"></span>
+                Generate Shopping List
+              </button>
+
+              <section class="detail-notes" aria-labelledby="detail-notes-title">
+                <div class="detail-notes__divider">
+                  <span id="detail-notes-title">Chef's notes</span>
+                </div>
+                <p id="detail-chef-note" class="detail-notes__body"></p>
+              </section>
+
+              <p id="detail-status" class="detail-status" role="status" aria-live="polite"></p>
+            </article>
           </div>
         </section>
 

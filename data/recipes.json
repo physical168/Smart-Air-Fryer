@@ -11,7 +11,9 @@
     "badge": "preset",
     "badgeLabel": "Preset available",
     "image": "https://www.figma.com/api/mcp/asset/8b2652d1-8751-4c8c-8501-0f59fe4dfb98",
-    "tip": "Flip once halfway for even crisping."
+    "tip": "Flip once halfway for even crisping.",
+    "tagline": "Savory buckwheat crepes from Brittany",
+    "chefNote": "The key to a perfect galette complétte is a high-heat sear followed by a gentle melt of the gruyère. Don't be afraid of the lacy edges—they're the best part."
   },
   {
     "id": "ham",
@@ -25,7 +27,9 @@
     "badge": "frozen",
     "badgeLabel": "Frozen setting",
     "image": "https://www.figma.com/api/mcp/asset/b25c3aec-2a00-460d-960c-7e3f23f67456",
-    "tip": "Use light oil spray to avoid drying."
+    "tip": "Use light oil spray to avoid drying.",
+    "tagline": "Frozen ham slices, crisp outside and juicy inside",
+    "chefNote": "Pat slices dry before cooking. A light oil spray keeps the ham from drying while the edges crisp up."
   },
   {
     "id": "seafood",
@@ -39,6 +43,8 @@
     "badge": "healthy",
     "badgeLabel": "Healthy choice",
     "image": "https://www.figma.com/api/mcp/asset/24c5963a-889f-4af7-8263-e7c38bbcc06e",
-    "tip": "Preheat for 2 minutes before cooking."
+    "tip": "Preheat for 2 minutes before cooking.",
+    "tagline": "Mixed seafood with a quick high-heat finish",
+    "chefNote": "Preheat the basket for two minutes. Cook in a single layer and shake halfway for even color."
   }
 ]
