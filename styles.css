@@ -1328,6 +1328,35 @@ select:focus-visible {
   box-shadow: none;
 }
 
+.history-pwa__install[hidden] {
+  display: none;
+}
+
+.history-pwa__safari {
+  margin-top: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+
+.history-pwa__safari-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.history-pwa__safari-steps {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
 .history-summary {
   margin: 0;
   font-size: 0.875rem;

@@ -719,11 +719,68 @@ function isAppInstalled() {
   );
 }
 
+function isSafariBrowser() {
+  const ua = navigator.userAgent;
+  return /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|FxiOS|EdgiOS|OPR|Edg/i.test(ua);
+}
+
+function isIosDevice() {
+  return (
+    /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  );
+}
+
+function getSafariInstallSteps() {
+  if (isIosDevice()) {
+    return [
+      "Open this page in Safari (not an in-app browser).",
+      "Tap the Share button at the bottom of the screen.",
+      "Scroll the menu and choose Add to Home Screen.",
+      "Tap Add — the app icon will appear on your Home Screen."
+    ];
+  }
+
+  return [
+    "Open this page in Safari on your Mac.",
+    "In the menu bar, click File → Add to Dock (or use the Share toolbar button).",
+    "Confirm Add to Dock — launch the app from your Dock like a native app.",
+    "Optional: Safari → Settings → Advanced → enable Develop menu for debugging."
+  ];
+}
+
+function updateSafariInstallGuide(context) {
+  const safariPanel = document.querySelector("#history-pwa-safari");
+  const stepsEl = document.querySelector("#history-pwa-safari-steps");
+  const installBtn = document.querySelector("#history-pwa-install");
+
+  if (!safariPanel || !stepsEl) {
+    return;
+  }
+
+  const showSafariGuide =
+    isSafariBrowser() && !isAppInstalled() && context !== "file" && !deferredInstallPrompt;
+
+  safariPanel.hidden = !showSafariGuide;
+
+  if (installBtn) {
+    installBtn.hidden = showSafariGuide;
+  }
+
+  if (showSafariGuide) {
+    stepsEl.innerHTML = getSafariInstallSteps()
+      .map((step) => `<li>${escapeHtml(step)}</li>`)
+      .join("");
+  }
+}
+
 function updatePwaInstallButton(context) {
   const installBtn = document.querySelector("#history-pwa-install");
   if (!installBtn) {
     return;
   }
+
+  installBtn.hidden = false;
 
   if (isAppInstalled()) {
     installBtn.disabled = true;
@@ -732,6 +789,12 @@ function updatePwaInstallButton(context) {
   }
 
   if (context === "file") {
+    installBtn.disabled = true;
+    installBtn.textContent = "Install app";
+    return;
+  }
+
+  if (isSafariBrowser() && !deferredInstallPrompt) {
     installBtn.disabled = true;
     installBtn.textContent = "Install app";
     return;
@@ -776,14 +839,21 @@ function updatePwaStatus() {
     }
   }
 
-  statusEl.textContent = getDeployStatusMessage(
-    context,
-    isControlled,
-    hasServiceWorker,
-    manifestOk
-  );
+  if (isSafariBrowser() && !isAppInstalled() && context !== "file" && !deferredInstallPrompt) {
+    statusEl.textContent = isIosDevice()
+      ? "On iPhone or iPad, use Share → Add to Home Screen (steps below)."
+      : "On Mac Safari, use File → Add to Dock (steps below).";
+  } else {
+    statusEl.textContent = getDeployStatusMessage(
+      context,
+      isControlled,
+      hasServiceWorker,
+      manifestOk
+    );
+  }
 
   updatePwaInstallButton(context);
+  updateSafariInstallGuide(context);
 }
 
 function renderHistoryList() {
@@ -1370,7 +1440,11 @@ function initHistoryInteractions() {
   if (installBtn) {
     installBtn.addEventListener("click", async () => {
       if (!deferredInstallPrompt) {
-        setHistoryStatus("Install is not available here. Try Chrome or Edge on HTTPS.", "");
+        if (isSafariBrowser()) {
+          setHistoryStatus("Follow the Safari steps shown above.", "success");
+        } else {
+          setHistoryStatus("Install is not available here. Try Chrome or Edge on HTTPS.", "");
+        }
         return;
       }
 
