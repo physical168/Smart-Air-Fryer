@@ -190,31 +190,6 @@ select:focus-visible {
   outline: none;
 }
 
-.view-placeholder h2:focus {
-  outline: 3px solid var(--focus);
-  outline-offset: 4px;
-}
-
-.view-placeholder {
-  padding: 2rem 1.5rem;
-  border: 2px dashed var(--border-soft);
-  border-radius: var(--radius-md);
-  background: var(--bg-surface);
-  text-align: center;
-  color: var(--muted);
-}
-
-.view-placeholder h2 {
-  margin: 0 0 0.5rem;
-  font-size: 1.25rem;
-  color: var(--ink);
-}
-
-.view-placeholder p {
-  margin: 0;
-  font-size: 0.9rem;
-}
-
 .app-footer {
   padding: 1rem 1.5rem 0.5rem;
   text-align: center;
@@ -1265,6 +1240,209 @@ select:focus-visible {
 
 .shopping-toolbar__btn--muted {
   color: var(--muted);
+}
+
+/* History — Figma 36:554 */
+.history-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.history-header__title {
+  margin: 0;
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.9px;
+  color: var(--ink);
+}
+
+.history-header__subtitle {
+  margin: 0.5rem 0 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.history-pwa {
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--accent-warm-border);
+  border-radius: var(--radius-xl);
+  background: var(--accent-warm-bg);
+}
+
+.history-pwa__badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.history-pwa__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent-coral);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.history-pwa__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.history-pwa__text {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.history-pwa__install {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 0.25rem;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(172, 53, 9, 0.2);
+}
+
+.history-pwa__install:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.history-summary {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history-card {
+  display: block;
+  width: 100%;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-xl);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-card);
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.history-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.history-card__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.history-card__date {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.history-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.history-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.history-card__tag {
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: var(--bg-tip);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.history-card__tag--favorite {
+  background: var(--accent-warm-bg);
+  color: var(--accent);
+}
+
+.history-card__tag--rating {
+  background: var(--accent-teal-bg);
+  color: var(--accent-teal);
+}
+
+.history-card__note {
+  margin: 0;
+  font-size: 0.875rem;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.history-empty {
+  margin: 0;
+  padding: 2rem 1.5rem;
+  border: 2px dashed var(--border-soft);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--muted);
+  background: var(--bg-surface);
+}
+
+.history-status {
+  margin: 0;
+  min-height: 1.25rem;
+  font-size: 0.9rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+.history-status--success {
+  color: var(--accent-teal);
 }
 
 @media (max-width: 600px) {

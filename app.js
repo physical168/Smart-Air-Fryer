@@ -1,6 +1,6 @@
 /**
  * Smart Air Fryer Assistant — Figma-driven app.
- * Commit 7: shopping list screen with interactive inventory.
+ * Commit 8: history screen, PWA polish, and accessibility pass.
  */
 
 const VIEWS = ["home", "detail", "shopping", "history"];
@@ -84,6 +84,7 @@ const FALLBACK_RECIPES = [
 ];
 
 let activeDetailFoodId = null;
+let deferredInstallPrompt = null;
 
 let recipes = [];
 let recipesById = new Map();
@@ -592,6 +593,278 @@ function removeShoppingItem(itemId) {
   writeShoppingList(readShoppingList().filter((item) => item.id !== itemId));
 }
 
+function formatHistoryDate(timestamp) {
+  if (!timestamp) {
+    return "Recently";
+  }
+  return new Date(timestamp).toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function buildHistoryEntries() {
+  const presets = readPresets();
+  const ratings = readRatings();
+  const shopping = readShoppingList();
+  const foodIds = new Set([...Object.keys(presets), ...Object.keys(ratings)]);
+  shopping.forEach((item) => {
+    if (item.sourceFoodId) {
+      foodIds.add(item.sourceFoodId);
+    }
+  });
+
+  const entries = [];
+
+  foodIds.forEach((foodId) => {
+    const recipe = recipesById.get(foodId);
+    if (!recipe) {
+      return;
+    }
+
+    const preset = presets[foodId];
+    const rating = ratings[foodId];
+    const listCount = shopping.filter((item) => item.sourceFoodId === foodId).length;
+    const latestAt = Math.max(preset?.updatedAt || 0, rating?.submittedAt || 0, 0);
+
+    if (!preset && !rating && listCount === 0) {
+      return;
+    }
+
+    entries.push({
+      foodId,
+      recipeName: recipe.name,
+      temperature: preset?.temperature ?? recipe.temperature,
+      minutes: preset?.minutes ?? recipe.minutes,
+      favorited: Boolean(preset?.favorited),
+      crunchiness: rating?.crunchiness || 0,
+      satisfaction: rating?.satisfaction || 0,
+      feedbackTag: rating?.tag || "",
+      personalNote: rating?.personalNote || "",
+      listCount,
+      latestAt
+    });
+  });
+
+  return entries.sort((a, b) => b.latestAt - a.latestAt);
+}
+
+function setHistoryStatus(message, type) {
+  const status = document.querySelector("#history-status");
+  if (!status) {
+    return;
+  }
+  status.textContent = message;
+  status.className = "history-status" + (type ? ` history-status--${type}` : "");
+}
+
+function getDeployContext() {
+  const { protocol, hostname } = window.location;
+
+  if (protocol === "file:") {
+    return "file";
+  }
+
+  if (hostname === "localhost" || hostname === "127.0.0.1") {
+    return "local";
+  }
+
+  if (hostname.endsWith("github.io")) {
+    return "github-pages";
+  }
+
+  if (protocol === "https:") {
+    return "hosted";
+  }
+
+  return "other";
+}
+
+function getDeployStatusMessage(context, isControlled, hasServiceWorker, manifestOk) {
+  if (!hasServiceWorker || !manifestOk) {
+    return "Use a modern browser (Chrome or Edge recommended) for install and offline features.";
+  }
+
+  if (context === "file") {
+    return "Opened as a file — open via GitHub Pages or http://localhost to enable install.";
+  }
+
+  if (isControlled) {
+    if (context === "github-pages") {
+      return "You are on GitHub Pages with offline mode on. Bookmark or install this app for quick access.";
+    }
+    if (context === "local") {
+      return "Local preview with offline mode on. Good for testing before you publish.";
+    }
+    return "Offline mode is on — the app keeps working if your connection drops.";
+  }
+
+  if (context === "github-pages") {
+    return "Published on GitHub Pages. Refresh once, then you can install or use offline.";
+  }
+
+  if (context === "local") {
+    return "Running on your computer. Refresh once (Ctrl+Shift+R) to turn on offline mode.";
+  }
+
+  return "Refresh this page once, then you can install the app or use it offline.";
+}
+
+function isAppInstalled() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true
+  );
+}
+
+function updatePwaInstallButton(context) {
+  const installBtn = document.querySelector("#history-pwa-install");
+  if (!installBtn) {
+    return;
+  }
+
+  if (isAppInstalled()) {
+    installBtn.disabled = true;
+    installBtn.textContent = "App installed";
+    return;
+  }
+
+  if (context === "file") {
+    installBtn.disabled = true;
+    installBtn.textContent = "Install app";
+    return;
+  }
+
+  if (deferredInstallPrompt) {
+    installBtn.disabled = false;
+    installBtn.textContent = "Install app";
+    return;
+  }
+
+  installBtn.disabled = true;
+  installBtn.textContent = "Install unavailable";
+}
+
+function updatePwaStatus() {
+  const statusEl = document.querySelector("#history-pwa-status");
+  const badgeEl = document.querySelector("#history-pwa-badge");
+  const context = getDeployContext();
+
+  if (!statusEl) {
+    return;
+  }
+
+  const hasServiceWorker = "serviceWorker" in navigator;
+  const isControlled = hasServiceWorker && Boolean(navigator.serviceWorker.controller);
+  const manifestOk = Boolean(document.querySelector('link[rel="manifest"]'));
+
+  if (badgeEl) {
+    if (!hasServiceWorker || !manifestOk) {
+      badgeEl.textContent = "Browser";
+    } else if (context === "file") {
+      badgeEl.textContent = "File only";
+    } else if (isAppInstalled()) {
+      badgeEl.textContent = "Installed";
+    } else if (isControlled) {
+      badgeEl.textContent = "Offline on";
+    } else if (context === "github-pages") {
+      badgeEl.textContent = "Online";
+    } else {
+      badgeEl.textContent = "Almost ready";
+    }
+  }
+
+  statusEl.textContent = getDeployStatusMessage(
+    context,
+    isControlled,
+    hasServiceWorker,
+    manifestOk
+  );
+
+  updatePwaInstallButton(context);
+}
+
+function renderHistoryList() {
+  const listEl = document.querySelector("#history-list");
+  const emptyEl = document.querySelector("#history-empty");
+  const summaryEl = document.querySelector("#history-summary");
+
+  if (!listEl) {
+    return;
+  }
+
+  updatePwaStatus();
+
+  const entries = buildHistoryEntries();
+
+  if (summaryEl) {
+    summaryEl.textContent = entries.length
+      ? `${entries.length} saved cook${entries.length === 1 ? "" : "s"}`
+      : "";
+  }
+
+  if (emptyEl) {
+    emptyEl.hidden = entries.length > 0;
+  }
+
+  if (entries.length === 0) {
+    listEl.innerHTML = "";
+    return;
+  }
+
+  listEl.innerHTML = entries
+    .map((entry) => {
+      const safeName = escapeHtml(entry.recipeName);
+      const tags = [];
+
+      if (entry.favorited) {
+        tags.push('<span class="history-card__tag history-card__tag--favorite">Favorite</span>');
+      }
+
+      if (entry.satisfaction > 0) {
+        tags.push(
+          `<span class="history-card__tag history-card__tag--rating">${entry.satisfaction}/5 satisfaction</span>`
+        );
+      }
+
+      if (entry.crunchiness > 0) {
+        tags.push(`<span class="history-card__tag">Crunch ${entry.crunchiness}/5</span>`);
+      }
+
+      if (entry.feedbackTag) {
+        tags.push(`<span class="history-card__tag">${escapeHtml(entry.feedbackTag)}</span>`);
+      }
+
+      if (entry.listCount > 0) {
+        tags.push(`<span class="history-card__tag">${entry.listCount} list items</span>`);
+      }
+
+      const noteBlock = entry.personalNote
+        ? `<p class="history-card__note">${escapeHtml(entry.personalNote)}</p>`
+        : "";
+
+      return `
+    <li>
+      <button type="button" class="history-card" data-history-food="${entry.foodId}">
+        <div class="history-card__head">
+          <h3 class="history-card__title">${safeName}</h3>
+          <time class="history-card__date" datetime="${new Date(entry.latestAt).toISOString()}">${formatHistoryDate(entry.latestAt)}</time>
+        </div>
+        <p class="history-card__meta">
+          <span>${entry.temperature}°C</span>
+          <span>${entry.minutes} min</span>
+        </p>
+        <div class="history-card__tags">${tags.join("")}</div>
+        ${noteBlock}
+      </button>
+    </li>
+  `;
+    })
+    .join("");
+}
+
 function showView(viewId, options = {}) {
   const { updateHistory = true, replaceHistory = false, foodId = null } = options;
 
@@ -632,6 +905,10 @@ function showView(viewId, options = {}) {
       }
     }
     renderShoppingList();
+  }
+
+  if (viewId === "history") {
+    renderHistoryList();
   }
 
   updateDocumentTitle(viewId);
@@ -901,12 +1178,18 @@ async function loadRecipes() {
   } catch (error) {
     setRecipesData(FALLBACK_RECIPES);
     renderFoodCards(recipes);
-    setSearchStatus(
-      window.location.protocol === "file:"
-        ? "Using built-in presets. For AJAX loading, run: python -m http.server 8000"
-        : "Loaded built-in presets (network fetch unavailable).",
-      ""
-    );
+    const deployContext = getDeployContext();
+    let fallbackMessage = "Using built-in presets (recipe file could not be loaded).";
+
+    if (deployContext === "file") {
+      fallbackMessage =
+        "Opened as a file — built-in presets only. Use localhost or GitHub Pages for full search.";
+    } else if (deployContext === "github-pages") {
+      fallbackMessage =
+        "Using built-in presets. If this persists on GitHub Pages, hard-refresh or check that data/recipes.json was pushed.";
+    }
+
+    setSearchStatus(fallbackMessage, deployContext === "file" ? "" : "");
     if (container) {
       container.setAttribute("aria-busy", "false");
     }
@@ -1053,6 +1336,64 @@ function initShoppingInteractions() {
   }
 }
 
+function initPwaInstall() {
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    updatePwaStatus();
+  });
+
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    setHistoryStatus("App installed — open it from your home screen or app list.", "success");
+    updatePwaStatus();
+  });
+}
+
+function initHistoryInteractions() {
+  const listEl = document.querySelector("#history-list");
+  const installBtn = document.querySelector("#history-pwa-install");
+
+  if (listEl) {
+    listEl.addEventListener("click", (event) => {
+      const card = event.target.closest("[data-history-food]");
+      if (!card) {
+        return;
+      }
+
+      const foodId = card.dataset.historyFood;
+      setHistoryStatus(`Opening ${recipesById.get(foodId)?.name || "preset"}…`, "success");
+      showView("detail", { foodId });
+    });
+  }
+
+  if (installBtn) {
+    installBtn.addEventListener("click", async () => {
+      if (!deferredInstallPrompt) {
+        setHistoryStatus("Install is not available here. Try Chrome or Edge on HTTPS.", "");
+        return;
+      }
+
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      updatePwaStatus();
+
+      if (choice.outcome === "accepted") {
+        setHistoryStatus("Installing…", "success");
+      } else {
+        setHistoryStatus("Install cancelled.", "");
+      }
+    });
+  }
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.ready.then(() => {
+      updatePwaStatus();
+    });
+  }
+}
+
 function initDetailFeedbackInteractions() {
   document.querySelectorAll(".detail-star-row").forEach((row) => {
     const field = row.dataset.ratingField;
@@ -1115,6 +1456,8 @@ async function initApp() {
   initDetailInteractions();
   initDetailFeedbackInteractions();
   initShoppingInteractions();
+  initPwaInstall();
+  initHistoryInteractions();
   document.documentElement.dataset.appReady = "true";
 }
 
@@ -1124,9 +1467,12 @@ function registerServiceWorker() {
   }
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js").catch(() => {
-      /* PWA optional during scaffold phase */
-    });
+    navigator.serviceWorker
+      .register("service-worker.js")
+      .then(() => updatePwaStatus())
+      .catch(() => {
+        /* Registration may fail on file:// — use a local server */
+      });
   });
 }
 

@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500;1,800&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="assets/icon.svg">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -287,10 +288,32 @@
           </div>
         </section>
 
-        <section id="view-history" class="app-view" data-view="history" aria-labelledby="history-placeholder-title" hidden tabindex="-1">
-          <div class="view-placeholder">
-            <h2 id="history-placeholder-title" tabindex="-1">History</h2>
-            <p>Culinary journey and saved cooks — commit 8.</p>
+        <section id="view-history" class="app-view" data-view="history" aria-labelledby="history-title" hidden tabindex="-1">
+          <div class="history-screen">
+            <header class="history-header">
+              <h2 id="history-title" class="history-header__title" tabindex="-1">History &amp; Progress</h2>
+              <p class="history-header__subtitle">Your culinary journey with saved presets and reviews</p>
+            </header>
+
+            <aside class="history-pwa" aria-labelledby="history-pwa-title">
+              <div class="history-pwa__badge-row">
+                <span class="history-pwa__badge" id="history-pwa-badge">App</span>
+                <h3 id="history-pwa-title" class="history-pwa__title">Use online or install</h3>
+              </div>
+              <p id="history-pwa-status" class="history-pwa__text">Checking how you opened this app…</p>
+              <button type="button" class="history-pwa__install" id="history-pwa-install" disabled>
+                Install app
+              </button>
+            </aside>
+
+            <p id="history-summary" class="history-summary" aria-live="polite"></p>
+            <ul id="history-list" class="history-list" aria-label="Cooking history"></ul>
+
+            <p id="history-empty" class="history-empty" hidden>
+              No saved cooks yet. Favorite a preset or save a review on the Detail screen.
+            </p>
+
+            <p id="history-status" class="history-status" role="status" aria-live="polite"></p>
           </div>
         </section>
       </main>
