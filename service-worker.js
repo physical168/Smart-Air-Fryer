@@ -1,4 +1,4 @@
-const cacheName = "atelierkitchen-smart-fryer-v6";
+const cacheName = "atelierkitchen-smart-fryer-v7";
 const cacheAssets = [
   "./",
   "index.html",

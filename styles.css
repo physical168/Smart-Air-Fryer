@@ -813,7 +813,6 @@ select:focus-visible {
   color: var(--ink);
   appearance: textfield;
   -moz-appearance: textfield;
-  field-sizing: content;
 }
 
 .detail-control__input::-webkit-outer-spin-button,
