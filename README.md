@@ -79,8 +79,15 @@ This project is a kitchen preset assistant — it does **not** need maps, media 
 
 ## Validation
 
-- [W3C HTML Validator](https://validator.w3.org/)
-- [W3C CSS Validator](https://jigsaw.w3.org/css-validator/)
+Validate the **deployed** URL (or upload local files) after each release:
+
+| Check | Tool | What to validate |
+|-------|------|------------------|
+| HTML | [W3C Nu Html Checker](https://validator.w3.org/nu/) | Upload `index.html` or paste your GitHub Pages URL |
+| CSS | [W3C CSS Validator](https://jigsaw.w3.org/css-validator/) | **Validate by URI**: `https://your-site/styles.css` (or upload `styles.css`) |
+
+Local `index.html` + `styles.css` were checked against these services (0 HTML errors, 0 CSS errors on the checked build).
+
 - Chrome Lighthouse (Accessibility, PWA)
 
 ## Other hosting
