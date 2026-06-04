@@ -26,7 +26,7 @@ const FALLBACK_RECIPES = [
     keywords: ["galette", "galettes", "french", "buckwheat", "jambon"],
     badge: "preset",
     badgeLabel: "Preset available",
-    image: "assets/foods/galettes.svg",
+    image: "assets/foods/galettes.png",
     tip: "Flip once halfway for even crisping.",
     tagline: "Savory buckwheat crepes from Brittany",
     chefNote:
@@ -48,7 +48,7 @@ const FALLBACK_RECIPES = [
     keywords: ["ham", "jambon", "frozen", "pork"],
     badge: "frozen",
     badgeLabel: "Frozen setting",
-    image: "assets/foods/ham.svg",
+    image: "assets/foods/ham.jpg",
     tip: "Use light oil spray to avoid drying.",
     tagline: "Frozen ham slices, crisp outside and juicy inside",
     chefNote:
@@ -70,7 +70,7 @@ const FALLBACK_RECIPES = [
     keywords: ["seafood", "shrimp", "fish", "mix", "healthy"],
     badge: "healthy",
     badgeLabel: "Healthy choice",
-    image: "assets/foods/seafood.svg",
+    image: "assets/foods/seafood.jpg",
     tip: "Preheat for 2 minutes before cooking.",
     tagline: "Mixed seafood with a quick high-heat finish",
     chefNote:
@@ -800,11 +800,12 @@ function formatHistoryDate(timestamp) {
   if (!timestamp) {
     return "Recently";
   }
-  return new Date(timestamp).toLocaleString(undefined, {
+  return new Date(timestamp).toLocaleString("en-GB", {
     month: "short",
     day: "numeric",
     hour: "2-digit",
-    minute: "2-digit"
+    minute: "2-digit",
+    hour12: false
   });
 }
 

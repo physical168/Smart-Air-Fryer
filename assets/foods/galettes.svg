@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="French galettes">
-  <rect width="192" height="192" rx="16" fill="#fff7ed"/>
-  <circle cx="96" cy="88" r="52" fill="#fed7aa" stroke="#fb923c" stroke-width="3"/>
-  <ellipse cx="96" cy="92" rx="38" ry="32" fill="#fdba74"/>
-  <circle cx="78" cy="82" r="6" fill="#ea580c" opacity="0.5"/>
-  <circle cx="108" cy="78" r="5" fill="#ea580c" opacity="0.4"/>
-  <text x="96" y="168" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="14" font-weight="700" fill="#9a3412">Galettes</text>
-</svg>
