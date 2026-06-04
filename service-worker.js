@@ -1,11 +1,15 @@
-const cacheName = "atelierkitchen-smart-fryer-v7";
+const cacheName = "atelierkitchen-smart-fryer-v9";
 const cacheAssets = [
   "./",
   "index.html",
   "styles.css",
   "app.js",
   "data/recipes.json",
+  "assets/icon-192.png",
   "assets/icon.png",
+  "assets/foods/galettes.svg",
+  "assets/foods/ham.svg",
+  "assets/foods/seafood.svg",
   "assets/nav/home.svg",
   "assets/nav/favorites.svg",
   "assets/nav/list.svg",

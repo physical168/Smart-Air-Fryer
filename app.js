@@ -26,7 +26,7 @@ const FALLBACK_RECIPES = [
     keywords: ["galette", "galettes", "french", "buckwheat", "jambon"],
     badge: "preset",
     badgeLabel: "Preset available",
-    image: "https://www.figma.com/api/mcp/asset/8b2652d1-8751-4c8c-8501-0f59fe4dfb98",
+    image: "assets/foods/galettes.svg",
     tip: "Flip once halfway for even crisping.",
     tagline: "Savory buckwheat crepes from Brittany",
     chefNote:
@@ -48,7 +48,7 @@ const FALLBACK_RECIPES = [
     keywords: ["ham", "jambon", "frozen", "pork"],
     badge: "frozen",
     badgeLabel: "Frozen setting",
-    image: "https://www.figma.com/api/mcp/asset/b25c3aec-2a00-460d-960c-7e3f23f67456",
+    image: "assets/foods/ham.svg",
     tip: "Use light oil spray to avoid drying.",
     tagline: "Frozen ham slices, crisp outside and juicy inside",
     chefNote:
@@ -70,7 +70,7 @@ const FALLBACK_RECIPES = [
     keywords: ["seafood", "shrimp", "fish", "mix", "healthy"],
     badge: "healthy",
     badgeLabel: "Healthy choice",
-    image: "https://www.figma.com/api/mcp/asset/24c5963a-889f-4af7-8263-e7c38bbcc06e",
+    image: "assets/foods/seafood.svg",
     tip: "Preheat for 2 minutes before cooking.",
     tagline: "Mixed seafood with a quick high-heat finish",
     chefNote:
@@ -927,6 +927,14 @@ function isSafariBrowser() {
   return /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|FxiOS|EdgiOS|OPR|Edg/i.test(ua);
 }
 
+function isFirefoxBrowser() {
+  return /Firefox/i.test(navigator.userAgent);
+}
+
+function isChromiumInstallBrowser() {
+  return /Chrome|Chromium|Edg/i.test(navigator.userAgent) && !isSafariBrowser();
+}
+
 function isIosDevice() {
   return (
     /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
@@ -1010,6 +1018,17 @@ function updatePwaInstallButton(context) {
   }
 
   installBtn.disabled = true;
+
+  if (isFirefoxBrowser()) {
+    installBtn.textContent = "Use Chrome or Edge";
+    return;
+  }
+
+  if (isChromiumInstallBrowser()) {
+    installBtn.textContent = "Use ⋮ menu → Install";
+    return;
+  }
+
   installBtn.textContent = "Install unavailable";
 }
 
@@ -1053,6 +1072,16 @@ function updatePwaStatus() {
       hasServiceWorker,
       manifestOk
     );
+
+    if (
+      !deferredInstallPrompt &&
+      !isAppInstalled() &&
+      context !== "file" &&
+      isChromiumInstallBrowser()
+    ) {
+      statusEl.textContent +=
+        " If the button stays disabled, open the browser menu (⋮) and choose Install app, or look for the install icon in the address bar.";
+    }
   }
 
   updatePwaInstallButton(context);
@@ -1711,15 +1740,17 @@ function initShoppingInteractions() {
 }
 
 function initPwaInstall() {
-  window.addEventListener("beforeinstallprompt", (event) => {
-    event.preventDefault();
-    deferredInstallPrompt = event;
-    updatePwaStatus();
-  });
-
   window.addEventListener("appinstalled", () => {
     deferredInstallPrompt = null;
     setHistoryStatus("App installed — open it from your home screen or app list.", "success");
+    updatePwaStatus();
+  });
+}
+
+function registerPwaInstallPromptEarly() {
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
     updatePwaStatus();
   });
 }
@@ -1853,5 +1884,6 @@ function registerServiceWorker() {
   });
 }
 
+registerPwaInstallPromptEarly();
 initApp();
 registerServiceWorker();

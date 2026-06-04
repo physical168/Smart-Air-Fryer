@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Frozen ham">
+  <rect width="192" height="192" rx="16" fill="#fff7ed"/>
+  <rect x="44" y="70" width="104" height="56" rx="12" fill="#fca5a5" stroke="#ef4444" stroke-width="3"/>
+  <rect x="52" y="78" width="88" height="40" rx="8" fill="#f87171"/>
+  <ellipse cx="96" cy="98" rx="28" ry="14" fill="#fecaca" opacity="0.7"/>
+  <text x="96" y="168" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="14" font-weight="700" fill="#9a3412">Ham</text>
+</svg>
